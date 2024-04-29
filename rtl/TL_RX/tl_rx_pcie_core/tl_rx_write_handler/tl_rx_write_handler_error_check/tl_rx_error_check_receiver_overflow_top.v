@@ -1,4 +1,4 @@
-module TL_RX_error_check_receiver_overflow_top #(
+module tl_rx_error_check_receiver_overflow_top #(
         parameter BUFFER_IN_DW_WIDTH=10,
         DLL_DATA_CREDS_WIDTH=16,
         RCV_DATA_CREDS_WIDTH=16,
@@ -80,7 +80,7 @@ module TL_RX_error_check_receiver_overflow_top #(
         endcase
     end
 
-    TL_RX_error_check_receiver_overflow u_p(
+    tl_rx_error_check_receiver_overflow u_p(
         .buffer_in_dw(p_buffer_in),
         .dll_data(p_dll_data),
         .dll_hdr(p_dll_hdr),
@@ -92,7 +92,7 @@ module TL_RX_error_check_receiver_overflow_top #(
         .receiver_overflow_error(p_receiver_overflow_error)
     );
 
-    TL_RX_error_check_receiver_overflow u_np(
+    tl_rx_error_check_receiver_overflow u_np(
         .buffer_in_dw(np_buffer_in),
         .dll_data(np_dll_data),
         .dll_hdr(np_dll_hdr),
@@ -104,7 +104,7 @@ module TL_RX_error_check_receiver_overflow_top #(
         .receiver_overflow_error(np_receiver_overflow_error)
     );
 
-    TL_RX_error_check_receiver_overflow u_cpl(
+    tl_rx_error_check_receiver_overflow u_cpl(
         .buffer_in_dw(cpl_buffer_in),
         .dll_data(cpl_dll_data),
         .dll_hdr(cpl_dll_hdr),

@@ -1,4 +1,4 @@
-module TL_RX_error_check_ecrc (
+module tl_rx_error_check_ecrc (
     input wire ecrc_en,
     input wire TD,
     input wire ecrc_check_en_config,

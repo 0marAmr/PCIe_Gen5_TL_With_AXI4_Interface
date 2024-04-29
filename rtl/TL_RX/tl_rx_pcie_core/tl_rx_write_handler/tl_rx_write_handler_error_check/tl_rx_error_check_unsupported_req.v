@@ -1,4 +1,4 @@
-module TL_RX_error_Check_ur #(
+module tl_rx_error_Check_ur #(
     ADDRESS_WIDTH = 64
 ) (
     input wire [ADDRESS_WIDTH-1:0] address,
@@ -60,15 +60,15 @@ module TL_RX_error_Check_ur #(
 
   always @(*) begin
     case (msg_code)
-      code1: valid_msg_code =1;
-      code2: valid_msg_code =1;
-      code3: valid_msg_code =1;
-      code4: valid_msg_code =1;
-      code5: valid_msg_code =1;
-      code6: valid_msg_code =1;
-      code7: valid_msg_code =1;
-      code8: valid_msg_code =1;
-      code9: valid_msg_code =1;
+      8'b0000_0000: valid_msg_code =1;
+      8'b0001_0000: valid_msg_code =1;
+      8'b0001_0010: valid_msg_code =1;
+      8'b0001_????: valid_msg_code =1;
+      8'b0010_0???: valid_msg_code =1;
+      8'b0011_00??: valid_msg_code =1;
+      8'b0100_????: valid_msg_code =1;
+      8'b0101_0000: valid_msg_code =1;
+      8'b0111_111?: valid_msg_code =1;
       default: valid_msg_code =0;
     endcase
 

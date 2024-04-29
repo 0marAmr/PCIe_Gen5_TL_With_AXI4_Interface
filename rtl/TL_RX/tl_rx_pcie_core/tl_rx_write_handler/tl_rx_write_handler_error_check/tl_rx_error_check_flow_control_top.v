@@ -1,4 +1,4 @@
-module TL_RX_error_check_flow_control_top #(
+module tl_rx_error_check_flow_control_top #(
     parameter FC_DATA_CREDS_WIDTH=16,
     FC_HDR_CREDS_WIDTH=12,
     DLL_DATA_CREDS_WIDTH=16,
@@ -74,7 +74,7 @@ module TL_RX_error_check_flow_control_top #(
         endcase
     end
 
-    TL_RX_error_check_flow_control u_p(
+    tl_rx_error_check_flow_control u_p(
         .data_creds_reg(p_data_creds_reg),
         .hdr_creds_reg(p_hdr_creds_reg),
         .data_scale_reg(p_data_scale_reg),
@@ -88,7 +88,7 @@ module TL_RX_error_check_flow_control_top #(
         .flow_control_error(p_flow_control_error)
     );
 
-    TL_RX_error_check_flow_control u_np(
+    tl_rx_error_check_flow_control u_np(
         .data_creds_reg(np_data_creds_reg),
         .hdr_creds_reg(np_hdr_creds_reg),
         .data_scale_reg(np_data_scale_reg),
@@ -102,7 +102,7 @@ module TL_RX_error_check_flow_control_top #(
         .flow_control_error(np_flow_control_error)
     );
 
-    TL_RX_error_check_flow_control u_cpl(
+    tl_rx_error_check_flow_control u_cpl(
         .data_creds_reg(cpl_data_creds_reg),
         .hdr_creds_reg(cpl_hdr_creds_reg),
         .data_scale_reg(cpl_data_scale_reg),

@@ -30,11 +30,11 @@
    Other            :
    -FHDR------------------------------------------------------------------------*/
 //0000 0100 1100 0001 0001 1101 1011 0111 :: 04C11DB7
-`define DW 32
 module tl_rx_write_handler_ecrc #(
-    parameter   VALID_DATA_WIDTH = 3,
-                DATA_WIDTH = 8*`DW
-                
+    parameter   DW = 32,
+                VALID_DATA_WIDTH = 3,
+                DATA_WIDTH = 8*DW,
+                ECRC_ON = 1
 ) (
     input   wire                            i_clk,
     input   wire                            i_n_rst,
@@ -45,13 +45,14 @@ module tl_rx_write_handler_ecrc #(
     input   wire                            i_en,
     input   wire                            i_done,
     input   wire                            i_cfg_ecrc_chk_en,
-    output  reg                             o_ecrc_error
+    output  reg                             o_ecrc_error,
+    output  wire                            o_cfg_ecrc_chk_capable
 );
 
-
+    assign o_cfg_ecrc_chk_capable = ECRC_ON;
     wire ecrc_en = i_en && i_cfg_ecrc_chk_en;
 
-    localparam DIGEST_WIDTH = 1*`DW;
+    localparam DIGEST_WIDTH = 1*DW;
     localparam [DIGEST_WIDTH-1:0] DEFAULT_SEED = 32'hFFFF_FFFF;
 
     localparam [2:0]    DW_1 = 3'd0,
@@ -111,43 +112,43 @@ module tl_rx_write_handler_ecrc #(
         crc_iteration = crc;
         case (i_length)     
         DW_1:begin
-            for(i=0; i<1*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(1*`DW-1) -i]);
+            for(i=0; i<1*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(1*DW-1) -i]);
             end
         end
         DW_2: begin
-            for(i=0; i<2*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(2*`DW-1) -i]);
+            for(i=0; i<2*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(2*DW-1) -i]);
             end
         end
         DW_3: begin
-            for(i=0; i<3*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(3*`DW-1) -i]);
+            for(i=0; i<3*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(3*DW-1) -i]);
             end
         end
         DW_4: begin
-            for(i=0; i<4*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(4*`DW-1) -i]);
+            for(i=0; i<4*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(4*DW-1) -i]);
             end
         end
         DW_5: begin
-            for(i=0; i<5*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(5*`DW-1) -i]);
+            for(i=0; i<5*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(5*DW-1) -i]);
             end
         end
         DW_6: begin
-            for(i=0; i<6*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(6*`DW-1) -i]);
+            for(i=0; i<6*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(6*DW-1) -i]);
             end
         end
         DW_7: begin
-            for(i=0; i<7*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(7*`DW-1) -i]);
+            for(i=0; i<7*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(7*DW-1) -i]);
             end
         end
         DW_8: begin
-            for(i=0; i<8*`DW; i=i+1)begin
-                crc_iteration = crc32_serial(crc_iteration, data[(8*`DW-1) -i]);
+            for(i=0; i<8*DW; i=i+1)begin
+                crc_iteration = crc32_serial(crc_iteration, data[(8*DW-1) -i]);
             end
         end
         endcase
@@ -192,28 +193,28 @@ module tl_rx_write_handler_ecrc #(
     always @(*) begin
     case (i_length)
     DW_1:begin
-        rcv_ecrc_input = i_data_in[8*`DW-1:7*`DW];
+        rcv_ecrc_input = i_data_in[8*DW-1:7*DW];
     end
     DW_2: begin
-        rcv_ecrc_input = i_data_in[7*`DW-1:6*`DW];
+        rcv_ecrc_input = i_data_in[7*DW-1:6*DW];
     end
     DW_3: begin
-        rcv_ecrc_input = i_data_in[6*`DW-1:5*`DW];
+        rcv_ecrc_input = i_data_in[6*DW-1:5*DW];
     end
     DW_4: begin
-        rcv_ecrc_input = i_data_in[5*`DW-1:4*`DW];
+        rcv_ecrc_input = i_data_in[5*DW-1:4*DW];
     end
     DW_5: begin
-        rcv_ecrc_input = i_data_in[4*`DW-1:3*`DW];
+        rcv_ecrc_input = i_data_in[4*DW-1:3*DW];
     end
     DW_6: begin
-        rcv_ecrc_input = i_data_in[3*`DW-1:2*`DW];
+        rcv_ecrc_input = i_data_in[3*DW-1:2*DW];
     end
     DW_7: begin
-        rcv_ecrc_input = i_data_in[2*`DW-1:1*`DW];
+        rcv_ecrc_input = i_data_in[2*DW-1:1*DW];
     end
     DW_8: begin
-        rcv_ecrc_input = i_data_in[1*`DW-1:0];
+        rcv_ecrc_input = i_data_in[1*DW-1:0];
     end
     default: begin
         rcv_ecrc_input = 32'b0;

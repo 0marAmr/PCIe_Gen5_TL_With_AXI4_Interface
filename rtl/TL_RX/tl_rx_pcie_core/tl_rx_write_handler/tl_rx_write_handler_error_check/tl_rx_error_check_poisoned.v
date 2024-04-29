@@ -1,4 +1,4 @@
-module TL_RX_error_check_poisoned (
+module tl_rx_error_check_poisoned (
     input wire EP,
     input wire poisoned_en,
     output reg poisoned_error
