@@ -12,10 +12,6 @@ interface Tx_FC_Interface #(
 )(
 );
     import Tx_Arbiter_Package::*;
-
-    logic [FC_HDR_WIDTH  - 1 : 0]   HdrFC;
-    logic [FC_DATA_WIDTH - 1 : 0]   DataFC;
-    FC_type_t                       TypeFC;
     logic [9:0]                     PTLP_1;
     logic [9:0]                     PTLP_2;
     FC_command_t                    Command_1;
@@ -43,18 +39,5 @@ interface Tx_FC_Interface #(
                 Command_2        
     );
 
-    // FC and DLL Interface
-    modport FC_DLL (
-        input   HdrFC,
-                DataFC,
-                TypeFC
-    );
-
-    // DLL, FC Interface
-    modport DLL_FC (
-        output  HdrFC, 
-                DataFC,
-                TypeFC
-    );
 
 endinterface: Tx_FC_Interface

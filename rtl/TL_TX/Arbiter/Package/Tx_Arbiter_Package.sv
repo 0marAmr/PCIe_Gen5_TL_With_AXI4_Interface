@@ -6,8 +6,8 @@
 /* Updates		: -								                    */
 /* Dependencies	: -								                    */
 /* Used			: AXI and AXI Bridge                                */
-/* Summary:  This file includes the parameters used in AXI Channels */
-/*           and for FIFOs & Data Type Definition for FSMs          */
+/* Summary:  This file includes the parameters used Arbiter         */
+/*           submodules                                             */
 /********************************************************************/
 
 package Tx_Arbiter_Package ;
@@ -67,38 +67,37 @@ package Tx_Arbiter_Package ;
                 /* 101 >> check FC_Cpl_D    for TLP                    */
                 /* 110 >> check FC_P_H      for TLP                    */
                 /* 111 >> check FC_P_H      for TLP                    */
-                typedef enum logic [3:0] {
-                    FC_P_H,
-                    FC_P_D,
-                    FC_NP_H,
-                    FC_NP_D,
-                    FC_CPL_H,
-                    FC_CPL_D,
-                    FC_DEFAULT
-                } FC_command_t;
+                typedef enum logic [2:0] {
+					FC_P_H,
+					FC_P_D,
+					FC_NP_H,
+					FC_NP_D,
+					FC_CPL_H,
+					FC_CPL_D,
+					FC_ERR,
+					FC_DEFAULT
+				} FC_command_t;
             
                 /******************** FC Result Encoding ********************/
                 typedef enum logic [1:0] {
                     FC_INVALID,
                     FC_FAILED,
                     FC_SUCCESS_1,
-                    FC_SUCCESS_2
+                    FC_SUCCESS_2,
+                    FC_SUCCESS_1_2
                 } FC_result_t;
             
             
                 /********************** FSM of Arbiter **********************/
-                typdef enum logic [1:0] {
+                typdef enum logic [2:0] {
                     IDLE,
-                    selection_state,
-                    start_storing_tlp,
-                    storing_beats
+                    TLP1_HDR,  // 1-  Check FC + Ordering, 2- Selection Done, 3- First Cycle of storing inside TLP Buffer 
+                    TLP1_Data, // 1-  Only storing all Data of TLP1
+                    TLP2_HDR,  // 1- First Cycle of storing inside TLP Buffer 
+                    TLP2_Data  // 1-  Only storing all Data of TLP2 
                 } arbiter_state;
+
                 
-                typedef struct {
-                    bool_t ordering_result ;
-                    FC_result_t fc_result ;
-                
-                } function_return_t; 
                 
                 
                 

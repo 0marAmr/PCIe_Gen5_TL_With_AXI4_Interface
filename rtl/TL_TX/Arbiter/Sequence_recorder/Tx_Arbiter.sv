@@ -14,13 +14,13 @@ module Tx_Arbiter # (
     input bit clk,
     input bit arst,
     // Interface with A2P_1 (Read)
-    Tx_Arbiter_A2P_1                _A2P_1_if,
+    logic                a2p1_valid,
     // Interface with A2P_1 (Write)
-    Tx_Arbiter_A2P_2                _A2P_2_if,
+    logic                a2p2_valid,
     // Interface with Master (Completion)
-    Tx_Arbiter_Master               _Master_if,
+    logic                master_valid,
     // Interface with Rx Router (Completion or Message)    
-    Tx_Arbiter_Rx_Router            _Rx_Router_if,
+    logic [1:0]           rx_router_valid,
     // Interface with Sequence Recorder (Store Sequence of 4 sources)
     Tx_Arbiter_Sequence_Recorder.TX_ARBITER_SEQUENCE_RECORDER    _Sequence_Recorder_if
 );
@@ -56,18 +56,18 @@ always_ff @(posedge clk or negedge arst) begin : calc_delayed_valid
         Rx_Router_delayed_valid   <= 1'b0;
     end
     else begin
-        A2P_1_delayed_valid       <= _A2P_1_if.Valid;
-        A2P_2_delayed_valid       <= _A2P_2_if.Valid;
-        Master_delayed_valid      <= _Master_if.Valid;
-        Rx_Router_delayed_valid   <= _Rx_Router_if.Valid[1];
+        A2P_1_delayed_valid       <= a2p1_valid;
+        A2P_2_delayed_valid       <= a2p2_valid;
+        Master_delayed_valid      <= master_valid;
+        Rx_Router_delayed_valid   <= rx_router_valid[1];
     end
 end
 
 always_comb begin : calc_pe_valid
-    A2P_1_pe_valid      = _A2P_1_if.Valid           & (~A2P_1_delayed_valid);
-    A2P_2_pe_valid      = _A2P_2_if.Valid           & (~A2P_2_delayed_valid);
-    Master_pe_valid     = _Master_if.Valid          & (~Master_delayed_valid);
-    Rx_Router_pe_valid  = _Rx_Router_if.Valid[1]    & (~Rx_Router_delayed_valid);
+    A2P_1_pe_valid      = a2p1_valid           & (~A2P_1_delayed_valid);
+    A2P_2_pe_valid      = a2p2_valid           & (~A2P_2_delayed_valid);
+    Master_pe_valid     = master_valid          & (~Master_delayed_valid);
+    Rx_Router_pe_valid  = rx_router_valid[1]    & (~Rx_Router_delayed_valid);
 end
 
 always_ff @(posedge clk or negedge arst) begin : calc_wr_en
@@ -89,7 +89,7 @@ always_ff @(posedge clk or negedge arst) begin : calc_wr_en
                     _Sequence_Recorder_if.wr_data_1     = A2P_1;
                     _Sequence_Recorder_if.wr_data_2     = A2P_2;
                     _Sequence_Recorder_if.wr_data_3     = MASTER;
-                    _Sequence_Recorder_if.wr_data_4     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
+                    _Sequence_Recorder_if.wr_data_4     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
                 end
             // 3 valid
                 // push 3 positions in "Sequence Recorder", need to prioritize between them which one first and second and so on..                    
@@ -98,21 +98,21 @@ always_ff @(posedge clk or negedge arst) begin : calc_wr_en
                     _Sequence_Recorder_if.wr_en         = 1'b1;
                     _Sequence_Recorder_if.wr_data_1     = A2P_2;
                     _Sequence_Recorder_if.wr_data_2     = MASTER;
-                    _Sequence_Recorder_if.wr_data_3     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
+                    _Sequence_Recorder_if.wr_data_3     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
                 end
                 4'b1011 : begin
                     _Sequence_Recorder_if.wr_mode       = 3;
                     _Sequence_Recorder_if.wr_en         = 1'b1;
                     _Sequence_Recorder_if.wr_data_1     = A2P_1;
                     _Sequence_Recorder_if.wr_data_2     = MASTER;
-                    _Sequence_Recorder_if.wr_data_3     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;                    
+                    _Sequence_Recorder_if.wr_data_3     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;                    
                 end
                 4'b1101 : begin
                     _Sequence_Recorder_if.wr_mode       = 3;
                     _Sequence_Recorder_if.wr_en         = 1'b1;
                     _Sequence_Recorder_if.wr_data_1     = A2P_1;
                     _Sequence_Recorder_if.wr_data_2     = A2P_2;
-                    _Sequence_Recorder_if.wr_data_3     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
+                    _Sequence_Recorder_if.wr_data_3     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
                 end
                 4'b1110 : begin
                     _Sequence_Recorder_if.wr_mode       = 3;
@@ -139,7 +139,7 @@ always_ff @(posedge clk or negedge arst) begin : calc_wr_en
                     _Sequence_Recorder_if.wr_mode       = 2;
                     _Sequence_Recorder_if.wr_en         = 1'b1;
                     _Sequence_Recorder_if.wr_data_1     = A2P_1;
-                    _Sequence_Recorder_if.wr_data_2     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
+                    _Sequence_Recorder_if.wr_data_2     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
                 end
                 4'b0110 : begin
                     _Sequence_Recorder_if.wr_mode       = 2;
@@ -151,13 +151,13 @@ always_ff @(posedge clk or negedge arst) begin : calc_wr_en
                     _Sequence_Recorder_if.wr_mode       = 2;
                     _Sequence_Recorder_if.wr_en         = 1'b1;
                     _Sequence_Recorder_if.wr_data_1     = A2P_2;
-                    _Sequence_Recorder_if.wr_data_2     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
+                    _Sequence_Recorder_if.wr_data_2     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
                 end
                 4'b0011 : begin
                     _Sequence_Recorder_if.wr_mode       = 2;
                     _Sequence_Recorder_if.wr_en         = 1'b1;
                     _Sequence_Recorder_if.wr_data_1     = MASTER;
-                    _Sequence_Recorder_if.wr_data_2     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
+                    _Sequence_Recorder_if.wr_data_2     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
                 end
             // 1 valid
                 4'b1000 : begin
@@ -178,7 +178,7 @@ always_ff @(posedge clk or negedge arst) begin : calc_wr_en
                 4'b0001 : begin
                     _Sequence_Recorder_if.wr_mode       = 1;
                     _Sequence_Recorder_if.wr_en         = 1'b1;
-                    _Sequence_Recorder_if.wr_data_1     = (_Rx_Router_if.Valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
+                    _Sequence_Recorder_if.wr_data_1     = (rx_router_valid[0]) ? RX_ROUTER_ERR : RX_ROUTER_CFG;
                 end
             default: begin
                     _Sequence_Recorder_if.wr_en         = 1'b0;
