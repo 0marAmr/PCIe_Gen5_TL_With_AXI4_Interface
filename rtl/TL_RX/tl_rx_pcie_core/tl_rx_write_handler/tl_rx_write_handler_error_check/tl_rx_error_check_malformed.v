@@ -1,4 +1,4 @@
-module TL_RX_error_check_malformed #(
+module tl_rx_error_check_malformed #(
     parameter DATA_WIDTH=10
 
 )(

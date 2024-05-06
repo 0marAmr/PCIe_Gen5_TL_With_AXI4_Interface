@@ -1,4 +1,4 @@
-module TL_RX_error_check_unexpected_cpl #(
+module tl_rx_error_check_unexpected_cpl #(
     REQUESTER_ID_WIDTH=16,
     REQUESTER_TAG_WIDTH=10
 ) (

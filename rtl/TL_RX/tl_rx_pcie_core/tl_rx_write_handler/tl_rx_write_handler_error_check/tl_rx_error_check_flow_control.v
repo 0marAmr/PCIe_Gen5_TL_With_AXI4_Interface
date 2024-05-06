@@ -1,4 +1,4 @@
-module TL_RX_error_check_flow_control #(
+module tl_rx_error_check_flow_control #(
     parameter FC_DATA_CREDS_WIDTH=16,
     FC_HDR_CREDS_WIDTH=12,
     DLL_DATA_CREDS_WIDTH=16,

@@ -1,4 +1,4 @@
-module TL_RX_error_check_receiver_overflow #(
+module tl_rx_error_check_receiver_overflow #(
         BUFFER_IN_CREDS_WIDTH=9,
         BUFFER_IN_DW_WIDTH=10,
         DLL_BUFFER_IN_CREDS_WIDTH=16,

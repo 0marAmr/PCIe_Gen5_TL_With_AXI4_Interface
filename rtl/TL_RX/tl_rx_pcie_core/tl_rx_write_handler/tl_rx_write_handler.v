@@ -34,8 +34,9 @@
    -FHDR------------------------------------------------------------------------*/
 `include "macros.vh"
 module tl_rx_write_handler #(
-    parameter   TYPE_DEC_WIDTH = 2,         // Posted - Non-Posted - Completion
-                RCV_BUS_WIDTH = 8*`DW,
+    parameter   DW = 32,
+                TYPE_DEC_WIDTH = 2,         // Posted - Non-Posted - Completion
+                RCV_BUS_WIDTH = 8*DW,
                 FLAGS_WIDTH = 6,
                 CTRL_BUS_WIDTH = 5,
                 HDR_CREDS_WIDTH = 12,
@@ -61,15 +62,15 @@ module tl_rx_write_handler #(
     output  wire    [TYPE_DEC_WIDTH-1:0]            o_buffer_type,
     output  wire                                    o_w_valid,
     /*POSTED*/
-    output  wire    [4*`DW-1:0]                     o_w_posted_hdr,
+    output  wire    [4*DW-1:0]                     o_w_posted_hdr,
     output  wire    [RCV_BUS_WIDTH-1:0]             o_w_posted_data,
     output  wire    [CTRL_BUS_WIDTH-1:0]            o_w_posted_ctrl,
     /*NON_POSTED*/
-    output  wire    [4*`DW-1:0]                     o_w_non_posted_hdr,
+    output  wire    [4*DW-1:0]                     o_w_non_posted_hdr,
     output  wire    [RCV_BUS_WIDTH-1:0]             o_w_non_posted_data,
     output  wire    [CTRL_BUS_WIDTH-1:0]            o_w_non_posted_ctrl,
     /*COMPLETION*/
-    output  wire    [4*`DW-1:0]                     o_w_completion_hdr,
+    output  wire    [4*DW-1:0]                     o_w_completion_hdr,
     output  wire    [RCV_BUS_WIDTH-1:0]             o_w_completion_data,
     output  wire    [CTRL_BUS_WIDTH-1:0]            o_w_completion_ctrl,
     //------ Read Handler Interface ------//
