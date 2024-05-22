@@ -1,25 +1,18 @@
 /* -----------------------------------------------------------------------------
-   Copyright (c) 2024 PCIe V5 graduation project under supervision of
-   Dr. Hosam Fahmy and Si vision company
+   Copyright (c) 2024 PCIe V5 graduation project
    -----------------------------------------------------------------------------
    FILE NAME :      tl_rx_w_handler
-   DEPARTMENT :     W_HANDLER
-   AUTHOR :         Omar Hafez
-   AUTHOR’S EMAIL : eng.omar.amr@gmail.com
+   DEPARTMENT :     Write Handler
+   AUTHOR :         Reem Mohamed - Omar Hafez
+   AUTHOR’S EMAIL : reemmuhamed118@gmail.com - eng.omar.amr@gmail.com
    -----------------------------------------------------------------------------
    RELEASE HISTORY
    VERSION  DATE        AUTHOR      DESCRIPTION
    1.0      2024-03-09              initial version
    -----------------------------------------------------------------------------
-   KEYWORDS : PCIe, Transaction_Layer,
-   -----------------------------------------------------------------------------
    PURPOSE : Transaction Layer Receiver block write handler top module, this block
    manages writing the received TLP in the RX buffers after checking that there are
    no errors in the TLP
-   -----------------------------------------------------------------------------
-   PARAMETERS
-   PARAM NAME               : RANGE  : DESCRIPTION                       : DEFAULT   : UNITS
-   DECODING_OUTPUT_WIDTH    :   2    : Posted - Nonposted - Completion   :   2       :   n/a
    -----------------------------------------------------------------------------
    REUSE ISSUES
    Reset Strategy   : n/a
@@ -32,72 +25,84 @@
    Synthesizable    : Y
    Other            :
    -FHDR------------------------------------------------------------------------*/
-`include "macros.vh"
 module tl_rx_write_handler #(
     parameter   DW = 32,
                 TYPE_DEC_WIDTH = 2,         // Posted - Non-Posted - Completion
                 RCV_BUS_WIDTH = 8*DW,
+                P_DATA_IP_WIDTH = 8*DW,
+                NP_DATA_IP_WIDTH = 1*DW,
+                CPL_DATA_IP_WIDTH = 8*DW,
                 FLAGS_WIDTH = 6,
-                CTRL_BUS_WIDTH = 5,
-                HDR_CREDS_WIDTH = 12,
-                DATA_CREDS_WIDTH = 16,
-                DATA_WIDTH = 10,
+                W_CTRL_BUS_WIDTH = 6,
+                HDR_FIELD_SIZE = 8,
+                DATA_FIELD_SIZE = 12,
+                PAYLOAD_LENGTH = 10,
                 ADDRESS_WIDTH = 64,
                 REQUESTER_ID_WIDTH = 16,
                 REQUESTER_TAG_WIDTH = 10,
-                BARS_WIDTH = 32
+                BARS_WIDTH = 32,
+                REQ_HDR_SIZE = 4*DW,
+                CPL_HDR_SIZE = 3*DW,
+                SCALE_BUS_WIDTH = 6
 ) (
     //------ Global Signals ------//
-    input   wire                                    i_clk,
-    input   wire                                    i_n_rst,
+    input   wire                            i_clk,
+    input   wire                            i_n_rst,
     //------- RX FLow Control Interface -------//
-    input   wire    [5:0]                           i_rx_fc_hdr_scale_bus,
-    input   wire    [5:0]                           i_rx_fc_data_scale_bus,
-    input   wire    [3*HDR_CREDS_WIDTH-1:0]         i_rx_fc_hdr_credits_received_bus,
-    input   wire    [3*DATA_CREDS_WIDTH-1:0]        i_rx_fc_data_credits_received_bus,
-    input   wire    [3*HDR_CREDS_WIDTH-1:0]         i_rx_fc_hdr_credits_allocated_bus,
-    input   wire    [3*DATA_CREDS_WIDTH-1:0]        i_rx_fc_data_credits_allocated_bus,
+    // input   wire    [5:0]                   i_rx_fc_hdr_scale_bus,
+    // input   wire    [5:0]                   i_rx_fc_data_scale_bus,
+    input   wire    [3*HDR_FIELD_SIZE-1:0]  i_rx_fc_hdr_credits_received_bus,
+    input   wire    [3*DATA_FIELD_SIZE-1:0] i_rx_fc_data_credits_received_bus,
+    input   wire    [3*HDR_FIELD_SIZE-1:0]  i_rx_fc_hdr_credits_allocated_bus,
+    input   wire    [3*DATA_FIELD_SIZE-1:0] i_rx_fc_data_credits_allocated_bus,
+    output  wire                            o_cr_hdr_inc,
+    output  wire                            o_cr_data_inc,
+    output  wire    [PAYLOAD_LENGTH-1:0]    o_payload_length,
     //------ Virtual Channels Interface -----//
-    input   wire    [FLAGS_WIDTH-1:0]               i_vcs_w_full_flags,
-    output  wire    [TYPE_DEC_WIDTH-1:0]            o_buffer_type,
-    output  wire                                    o_w_valid,
+    input   wire    [FLAGS_WIDTH-1:0]       i_vcs_w_full_flags,
+    output  wire    [TYPE_DEC_WIDTH-1:0]    o_buffer_type,
+    output  wire                            o_w_valid,
     /*POSTED*/
-    output  wire    [4*DW-1:0]                     o_w_posted_hdr,
-    output  wire    [RCV_BUS_WIDTH-1:0]             o_w_posted_data,
-    output  wire    [CTRL_BUS_WIDTH-1:0]            o_w_posted_ctrl,
+    output  wire    [REQ_HDR_SIZE-1:0]      o_w_posted_hdr,
+    output  wire    [P_DATA_IP_WIDTH-1:0]   o_w_posted_data,
+    output  wire    [W_CTRL_BUS_WIDTH-1:0]  o_w_posted_ctrl,
     /*NON_POSTED*/
-    output  wire    [4*DW-1:0]                     o_w_non_posted_hdr,
-    output  wire    [RCV_BUS_WIDTH-1:0]             o_w_non_posted_data,
-    output  wire    [CTRL_BUS_WIDTH-1:0]            o_w_non_posted_ctrl,
+    output  wire    [REQ_HDR_SIZE-1:0]      o_w_non_posted_hdr,
+    output  wire    [NP_DATA_IP_WIDTH-1:0]  o_w_non_posted_data,
+    output  wire    [W_CTRL_BUS_WIDTH-1:0]  o_w_non_posted_ctrl,
     /*COMPLETION*/
-    output  wire    [4*DW-1:0]                     o_w_completion_hdr,
-    output  wire    [RCV_BUS_WIDTH-1:0]             o_w_completion_data,
-    output  wire    [CTRL_BUS_WIDTH-1:0]            o_w_completion_ctrl,
+    output  wire    [CPL_HDR_SIZE-1:0]      o_w_completion_hdr,
+    output  wire    [CPL_DATA_IP_WIDTH-1:0] o_w_completion_data,
+    output  wire    [W_CTRL_BUS_WIDTH-1:0]  o_w_completion_ctrl,
     //------ Read Handler Interface ------//
-    input   wire    [REQUESTER_ID_WIDTH-1:0]        i_device_requester_id,
+    input   wire    [REQUESTER_ID_WIDTH-1:0]    i_device_id,
     //------ Config Space Interface ------//
-    input   wire                                    i_cfg_ecrc_chk_en,
-    input   wire    [2:0]                           i_cfg_max_payload_size,
-    input   wire    [6*BARS_WIDTH-1:0]              i_cfg_BARs,
+    input   wire                                i_cfg_ecrc_chk_en,
+    input   wire                                i_cfg_memory_space_en,
+    input   wire                                i_cfg_io_space_en,
+    input   wire    [2:0]                       i_cfg_max_payload_size,
+    input   wire    [6*BARS_WIDTH-1:0]          i_cfg_BARs,
+    //------ Error Handler Interface ------//
+    output  wire    [2:0]                       o_error_type,
     //------ TL_TX interface ------//
-    input   wire    [REQUESTER_TAG_WIDTH-1:0]       i_tx_last_req_tag,
-    input   wire    [3*HDR_CREDS_WIDTH-1:0]         i_tx_fc_hdr_credit_limit_bus,
-    input   wire    [3*DATA_CREDS_WIDTH-1:0]        i_tx_fc_data_credit_limit_bus,
-    input   wire    [5:0]                           i_tx_fc_hdr_scale_bus,
-    input   wire    [5:0]                           i_tx_fc_data_scale_bus,
+    input   wire    [REQUESTER_TAG_WIDTH-1:0]   i_tx_last_req_tag,
+    input   wire    [3*HDR_FIELD_SIZE-1:0]      i_tx_fc_hdr_credit_limit_bus,
+    input   wire    [3*DATA_FIELD_SIZE-1:0]     i_tx_fc_data_credit_limit_bus,
+    input   wire    [SCALE_BUS_WIDTH-1:0]       i_tx_fc_hdr_scale_bus,
+    input   wire    [SCALE_BUS_WIDTH-1:0]       i_tx_fc_data_scale_bus,
     //------ DLL-RX TLP Interface ------//
-    input   wire                                    i_dll_rcv_sop,
-    input   wire    [RCV_BUS_WIDTH-1:0]             i_dll_rcv_tlp,
-    input   wire                                    i_dll_rcv_eop,
-    input   wire    [2:0]                           i_dll_last_byte,
-    output  wire                                    o_tl_tlp_rcv_blk,
+    input   wire                                i_dll_rx_sop,
+    input   wire    [RCV_BUS_WIDTH-1:0]         i_dll_rx_tlp,
+    input   wire                                i_dll_rx_eop,
+    input   wire    [2:0]                       i_dll_rx_last_dw,
+    output  wire                                o_dll_rx_tlp_discard,
     //------ DLL-RX Flow Control Interface ------//
-    input   wire    [1:0]                           i_dll_typ,
-    input   wire    [HDR_CREDS_WIDTH-1:0]           i_dll_hdr_creds,
-    input   wire    [DATA_CREDS_WIDTH-1:0]          i_dll_data_creds,
-    input   wire    [1:0]                           i_dll_hdr_scale,
-    input   wire    [1:0]                           i_dll_data_scale,
-    input   wire                                    i_dll_valid
+    input   wire    [1:0]                       i_dll_rx_fc_typ,
+    input   wire    [HDR_FIELD_SIZE-1:0]        i_dll_rx_fc_hdr_creds,
+    input   wire    [DATA_FIELD_SIZE-1:0]       i_dll_rx_fc_data_creds,
+    input   wire    [1:0]                       i_dll_rx_fc_hdr_scale,
+    input   wire    [1:0]                       i_dll_rx_fc_data_scale,
+    input   wire                                i_dll_rx_fc_valid
 );
 
     localparam  VALID_DATA      = 3;
@@ -107,7 +112,7 @@ module tl_rx_write_handler #(
     localparam  HDR_FIELDS_WIDTH  = 118;
 
      // ----- TLP Processing <=> Error Check -----//
-    wire                            rcv_error;
+    wire                            error_check;
     wire    [TRAS_TYPE_WIDTH-1:0]   transaction_type;
     wire                            write_n_read;
     wire                            address_type;
@@ -131,17 +136,16 @@ module tl_rx_write_handler #(
     tl_rx_write_handler_tlp_processing #(
         .TYPE_DEC_WIDTH(TYPE_DEC_WIDTH),
         .FLAGS_WIDTH(FLAGS_WIDTH),
-        .CTRL_BUS_WIDTH(CTRL_BUS_WIDTH),
+        .W_CTRL_BUS_WIDTH(W_CTRL_BUS_WIDTH),
         .RCV_BUS_WIDTH(RCV_BUS_WIDTH)
     ) u_tlp_processing (
         .i_clk(i_clk),
         .i_n_rst(i_n_rst),
         // ----- DLL Interface -----//
-        .i_dll_rcv_sop(i_dll_rcv_sop),
-        .i_dll_rcv_tlp(i_dll_rcv_tlp),
-        .o_tlp_rcv_blk(o_tl_tlp_rcv_blk),
+        .i_dll_rx_sop(i_dll_rx_sop),
+        .i_dll_rx_tlp(i_dll_rx_tlp),
         // ----- Error Check Interface -----//
-        .i_rcv_error(0), // rcv_error
+        .i_rcv_error(error_check),
         .o_transaction_type(transaction_type),
         .o_buffer_type(o_buffer_type),
         .o_write_n_read(write_n_read),
@@ -170,7 +174,11 @@ module tl_rx_write_handler #(
         /*COMPLETION*/
         .o_w_completion_hdr(o_w_completion_hdr),
         .o_w_completion_data(o_w_completion_data),
-        .o_w_completion_ctrl(o_w_completion_ctrl)
+        .o_w_completion_ctrl(o_w_completion_ctrl),
+        //-------- RX FLow Control Interface ------//
+        .o_cr_hdr_inc(o_cr_hdr_inc),
+		.o_cr_data_inc(o_cr_data_inc),
+		.o_payload_length(o_payload_length)
     );
 
     tl_rx_write_handler_ecrc #(
@@ -189,23 +197,21 @@ module tl_rx_write_handler #(
         // ----- ERROR Block Interface -----//
         .o_ecrc_error(ecrc_error),
         // ----- DLL Interface -----//
-        .i_data_in(i_dll_rcv_tlp)
+        .i_data_in(i_dll_rx_tlp)
     );
 
      tl_rx_error_check #(
-        .DLL_HDR_CREDS_WIDTH(HDR_CREDS_WIDTH),
-        .DLL_DATA_CREDS_WIDTH(DATA_CREDS_WIDTH),
-        .RCV_HDR_CREDS_WIDTH(HDR_CREDS_WIDTH),
-        .RCV_DATA_CREDS_WIDTH(DATA_CREDS_WIDTH),
-        .FC_HDR_CREDS_WIDTH(HDR_CREDS_WIDTH),
-        .FC_DATA_CREDS_WIDTH(DATA_CREDS_WIDTH),
-        .DATA_WIDTH(DATA_WIDTH),
+        .HDR_FIELD_SIZE(HDR_FIELD_SIZE),
+        .DATA_FIELD_SIZE(DATA_FIELD_SIZE),
+        .FC_HDR_CREDS_WIDTH(HDR_FIELD_SIZE),
+        .FC_DATA_CREDS_WIDTH(DATA_FIELD_SIZE),
+        .PAYLOAD_LENGTH(PAYLOAD_LENGTH),
         .ADDRESS_WIDTH(ADDRESS_WIDTH),
         .REQUESTER_ID_WIDTH(REQUESTER_ID_WIDTH),
         .REQUESTER_TAG_WIDTH(REQUESTER_TAG_WIDTH)
     ) u_error_check (
-        .clk(i_clk),
-        .rst(i_n_rst),
+        .i_clk(i_clk),
+        .i_n_rst(i_n_rst),
         //-------- TLP Processing Interface ------//
         .i_transaction_type(transaction_type), /*MEMORY - IO - CONFIGURATION - COMPLETION - MESSAGE*/
         .i_buffer_type(o_buffer_type),
@@ -215,37 +221,45 @@ module tl_rx_write_handler #(
         .i_rcv_done(rcv_done),
         .i_error_check_hdr_fields(error_check_hdr_fields),
         .i_error_check_en(error_check_en),
-        .o_error_check(rcv_error),
+        .o_error_check(error_check),
         // ------ ECRC Interface ------//
         .i_ecrc_error_check(ecrc_error),
         //-------- RX FLow Control Interface ------//
-        .i_rx_fc_hdr_scale_bus(i_rx_fc_hdr_scale_bus),
-        .i_rx_fc_data_scale_bus(i_rx_fc_data_scale_bus),
+        // .i_rx_fc_hdr_scale_bus(i_rx_fc_hdr_scale_bus),
+        // .i_rx_fc_data_scale_bus(i_rx_fc_data_scale_bus),
         .i_rx_fc_hdr_credits_received_bus(i_rx_fc_hdr_credits_received_bus),
         .i_rx_fc_data_credits_received_bus(i_rx_fc_data_credits_received_bus),
         .i_rx_fc_hdr_credits_allocated_bus(i_rx_fc_hdr_credits_allocated_bus),
         .i_rx_fc_data_credits_allocated_bus(i_rx_fc_data_credits_allocated_bus),
         //-------- TL TX Interface ------//
-        .tx_last_req_tag(i_tx_last_req_tag),
+        .i_tx_last_req_tag(i_tx_last_req_tag),
         .i_tx_fc_hdr_credit_limit_bus(i_tx_fc_hdr_credit_limit_bus),
         .i_tx_fc_data_credit_limit_bus(i_tx_fc_data_credit_limit_bus),
         .i_tx_fc_hdr_scale_bus(i_tx_fc_hdr_scale_bus),
         .i_tx_fc_data_scale_bus(i_tx_fc_data_scale_bus),
-        //-------- Data Link Layer Interface ------//
-        .i_dll_data_creds(i_dll_data_creds),
-        .i_dll_hdr_creds(i_dll_hdr_creds),
-        .i_dll_data_scale(i_dll_data_scale),
-        .i_dll_hdr_scale(i_dll_hdr_scale),
-        .i_dll_valid(i_dll_valid),
-        .i_dll_typ(i_dll_typ),
-        .i_dll_eop(i_dll_rcv_eop),
-        .i_dll_last_byte(i_dll_last_byte),
+        //-------- DLL RX Interface ------//
+        /*DLL-RX TLP*/
+        .i_dll_rx_sop(i_dll_rx_sop),
+        .i_dll_rx_eop(i_dll_rx_eop),
+        .i_dll_rx_last_dw(i_dll_rx_last_dw),
+        .o_dll_rx_tlp_discard(o_dll_rx_tlp_discard),
+        /*DLL-RX FC*/
+        .i_dll_rx_fc_typ(i_dll_rx_fc_typ),
+        .i_dll_rx_fc_valid(i_dll_rx_fc_valid),
+        .i_dll_rx_fc_hdr_scale(i_dll_rx_fc_hdr_scale),
+        .i_dll_rx_fc_hdr_creds(i_dll_rx_fc_hdr_creds),
+        .i_dll_rx_fc_data_scale(i_dll_rx_fc_data_scale),
+        .i_dll_rx_fc_data_creds(i_dll_rx_fc_data_creds),
         // ------ Configuration Space Interface ------//
-        .i_max_payload_config(i_cfg_max_payload_size),
         .i_ecrc_check_en_config(i_cfg_ecrc_chk_en),
+        .i_cfg_memory_space_en(i_cfg_memory_space_en),
+        .i_cfg_io_space_en(i_cfg_io_space_en),
+        .i_max_payload_config(i_cfg_max_payload_size),
         .i_BARSs(i_cfg_BARs),
         //------ Read Handler Interface ------//
-        .i_device_requester_id(i_device_requester_id)
+        .i_device_id(i_device_id),
+        //------ Error Handler Interface ------//
+        .o_error_type(o_error_type)
     );
 
 endmodule

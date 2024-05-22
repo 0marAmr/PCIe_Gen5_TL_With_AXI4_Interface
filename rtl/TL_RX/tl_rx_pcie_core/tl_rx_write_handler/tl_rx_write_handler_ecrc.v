@@ -1,22 +1,16 @@
 /* -----------------------------------------------------------------------------
-   Copyright (c) 2024 PCIe V5 graduation project under supervision of
-   Dr. Hosam Fahmy and Si vision company
+   Copyright (c) 2024 PCIe V5 graduation project
    -----------------------------------------------------------------------------
    FILE NAME :      tl_rx_write_handler_ecrc
-   DEPARTMENT :     W_HANDLER
-   AUTHORS :        Omar Muhammed, Omar Hafez
+   DEPARTMENT :     tl_rx_write_handler
+   AUTHORS :        Omar Muhammed - Omar Hafez
    AUTHOR’S EMAIL : eng.omar.amr@gmail.com
    -----------------------------------------------------------------------------
    RELEASE HISTORY
    VERSION  DATE        AUTHOR      DESCRIPTION
    1.0      2024-03-09              initial version
    -----------------------------------------------------------------------------
-   KEYWORDS : PCIe, Transaction_Layer,
-   -----------------------------------------------------------------------------
    PURPOSE :
-   -----------------------------------------------------------------------------
-   PARAMETERS
-   PARAM NAME               : RANGE  : DESCRIPTION                       : DEFAULT   : UNITS
    -----------------------------------------------------------------------------
    REUSE ISSUES
    Reset Strategy   : n/a
@@ -45,7 +39,7 @@ module tl_rx_write_handler_ecrc #(
     input   wire                            i_en,
     input   wire                            i_done,
     input   wire                            i_cfg_ecrc_chk_en,
-    output  reg                             o_ecrc_error,
+    output  wire                            o_ecrc_error,
     output  wire                            o_cfg_ecrc_chk_capable
 );
 
@@ -223,12 +217,6 @@ module tl_rx_write_handler_ecrc #(
     end
 
     /*Output*/
-    always @(*) begin
-        if (i_done) begin
-            o_ecrc_error = (rcv_ecrc != crc32); 
-        end
-        else begin
-            o_ecrc_error = 1'b0;
-        end
-    end 
+    assign o_ecrc_error = (rcv_ecrc != crc32) && i_done; 
+    
 endmodule

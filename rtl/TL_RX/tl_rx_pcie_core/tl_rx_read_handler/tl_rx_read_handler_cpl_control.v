@@ -1,10 +1,10 @@
 /* -----------------------------------------------------------------------------
    Copyright (c) 2024 PCIe V5 graduation project
    -----------------------------------------------------------------------------
-   FILE NAME :      TL_RX_read_handler_cpl_control
+   FILE NAME :      tl_rx_read_handler_cpl_control
    DEPARTMENT :     Read Handler
-   AUTHOR :         Omar Hafez
-   AUTHOR’S EMAIL : eng.omar.amr@gmail.com
+   AUTHOR :         Reem Mohamed - Omar Hafez
+   AUTHOR’S EMAIL : reemmuhamed118@gmail.com - eng.omar.amr@gmail.com
    -----------------------------------------------------------------------------
    RELEASE HISTORY
    VERSION  DATE        AUTHOR      DESCRIPTION
@@ -23,21 +23,24 @@
    Synthesizable    : Y
    Other            :
    -FHDR------------------------------------------------------------------------*/
-`include "macros.vh"
-module TL_RX_read_handler_cpl_control #(
+module tl_rx_read_handler_cpl_control #(
     parameter   CPL_FLAGS_WIDTH = 2,
                 PAYLOAD_LENGTH = 10,
                 VALID_DATA_WIDTH = 5,
-                R_CTRL_BUS_WIDTH = 5
+                R_CTRL_BUS_WIDTH = 6
 ) (     
+    //------ Global Signals ------//
     input   wire                                i_clk,
     input   wire                                i_n_rst,
-    /**Channel Interface**/
+    //----- Virtual Channels Interface -----//
     input   wire                                i_cpl_fmt_data_bit,
     input   wire    [CPL_FLAGS_WIDTH-1:0]       i_vcn_cpl_r_empty_flags,
     input   wire    [PAYLOAD_LENGTH-1:0]        i_cpl_length_field,
     output  wire    [R_CTRL_BUS_WIDTH-1:0]      o_r_completion_ctrl,
-    /**Slave Interface**/
+    //------- RX FLow Control Interface -------//
+    output  wire                                o_cpl_ca_hdr_inc,
+    output  reg                                 o_cpl_ca_data_inc,
+    //----- AXI Slave Interface -----//
     input   wire                                i_slave_ready,
     output  reg                                 o_slave_cpl_vaild,
     output  reg     [VALID_DATA_WIDTH-1:0]      o_slave_cpl_valid_data    /*indicates the valid data Double Words on the completion data bus- all ones means all the 32 DWs are valid*/
@@ -65,15 +68,18 @@ module TL_RX_read_handler_cpl_control #(
     reg counter_en;
     reg [STATE_REG_WIDTH-1:0]   present_state;              /*fsm present state register*/
     reg [STATE_REG_WIDTH-1:0]   next_state;                 /*fsm next state logic*/ 
+    
     assign {vcn_cpl_hdr_empty_flag, vcn_cpl_data_empty_flag} = i_vcn_cpl_r_empty_flags;                    
 
     wire buffer_empty = vcn_cpl_hdr_empty_flag && vcn_cpl_data_empty_flag;
     wire [1:0] r_status = next_state;
     wire send_done;
+   
+    wire r_data_allignment = 0;  // 1: Least 4DW, Most 4DW, 0: Least 5DW, Most 3DW | in completion, it is hard-wired to 1, added just for completness
 
-    assign o_r_completion_ctrl = {vcn_read_hdr_inc_en, vcn_read_data_inc_en, vcn_read_data_inc_value};
+    assign o_r_completion_ctrl = {vcn_read_hdr_inc_en, vcn_read_data_inc_en, vcn_read_data_inc_value, r_data_allignment};
     assign {vcn_cpl_hdr_empty_flag, vcn_cpl_data_empty_flag} = i_vcn_cpl_r_empty_flags;
-
+    assign o_cpl_ca_hdr_inc = 0; // increment rx fc header credits allocated counter when incrementing read header pointer of the VC buffer
     
    /************************************
     *********** Cycles Counter *********
@@ -128,22 +134,47 @@ module TL_RX_read_handler_cpl_control #(
         else if(~send_done) begin
             vcn_read_data_inc_value = 3'd4;
         end
-        else if (o_slave_cpl_valid_data > 5'd27) begin
+        else if (o_slave_cpl_valid_data > 5'd28) begin
             vcn_read_data_inc_value = 3'd5;
         end
-        else if (o_slave_cpl_valid_data > 5'd19) begin
+        else if (o_slave_cpl_valid_data > 5'd20) begin
             vcn_read_data_inc_value = 3'd4;
         end
-        else if (o_slave_cpl_valid_data > 5'd11) begin
+        else if (o_slave_cpl_valid_data > 5'd12) begin
             vcn_read_data_inc_value = 3'd3;
         end
-        else if (o_slave_cpl_valid_data > 5'd3) begin
+        else if (o_slave_cpl_valid_data > 5'd4) begin
             vcn_read_data_inc_value = 3'd2;
         end
         else begin
             vcn_read_data_inc_value = 3'd1;
         end
     end
+
+    // always @(*) begin
+    //     vcn_read_data_inc_value = 0;
+    //     if (buffer_empty || ~vcn_read_data_inc_en) begin
+    //         vcn_read_data_inc_value = 0;
+    //     end
+    //     else if(~send_done) begin
+    //         vcn_read_data_inc_value = 3'd4;
+    //     end
+    //     else if (o_slave_cpl_valid_data > 5'd27) begin
+    //         vcn_read_data_inc_value = 3'd5;
+    //     end
+    //     else if (o_slave_cpl_valid_data > 5'd19) begin
+    //         vcn_read_data_inc_value = 3'd4;
+    //     end
+    //     else if (o_slave_cpl_valid_data > 5'd11) begin
+    //         vcn_read_data_inc_value = 3'd3;
+    //     end
+    //     else if (o_slave_cpl_valid_data > 5'd3) begin
+    //         vcn_read_data_inc_value = 3'd2;
+    //     end
+    //     else begin
+    //         vcn_read_data_inc_value = 3'd1;
+    //     end
+    // end
 
     /**************************************
     ***************** FSM *****************
@@ -167,6 +198,7 @@ module TL_RX_read_handler_cpl_control #(
         vcn_read_hdr_inc_en = 0;
         vcn_read_data_inc_en = 0;
         // o_slave_cpl_last = 0;
+        o_cpl_ca_data_inc = 0;
         o_slave_cpl_valid_data = 0;
         case (present_state)
             IDLE: begin
@@ -227,6 +259,7 @@ module TL_RX_read_handler_cpl_control #(
                     vcn_read_hdr_inc_en = 1'b1;
                     vcn_read_data_inc_en =1'b1;
                     // o_slave_cpl_last = 1'b1;
+                    o_cpl_ca_data_inc = 1'b1;       // increment rx fc data credits allocated counter only after 
                     o_slave_cpl_valid_data = last_dw_location_logic; //all ones means all the 32 DWs are valid
                 end
             end

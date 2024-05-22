@@ -1,29 +1,29 @@
 module tl_rx_error_check_flow_control_top #(
     parameter FC_DATA_CREDS_WIDTH=16,
     FC_HDR_CREDS_WIDTH=12,
-    DLL_DATA_CREDS_WIDTH=16,
-    DLL_HDR_CREDS_WIDTH=12
+    DLL_HDR_CREDS_WIDTH=8,
+    DLL_DATA_CREDS_WIDTH=12
 ) (
-    input   wire[FC_DATA_CREDS_WIDTH-1:0]   p_data_creds_reg,
-    input   wire[FC_HDR_CREDS_WIDTH-1:0]    p_hdr_creds_reg,    
-    input   wire[FC_DATA_CREDS_WIDTH-1:0]   np_data_creds_reg,
-    input   wire[FC_HDR_CREDS_WIDTH-1:0]    np_hdr_creds_reg,  
-    input   wire[FC_DATA_CREDS_WIDTH-1:0]   cpl_data_creds_reg,
-    input   wire[FC_HDR_CREDS_WIDTH-1:0]    cpl_hdr_creds_reg,
-    input   wire[1:0]                       p_data_scale_reg,
-    input   wire[1:0]                       p_hdr_scale_reg,    
-    input   wire[1:0]                       np_data_scale_reg,
-    input   wire[1:0]                       np_hdr_scale_reg,    
-    input   wire[1:0]                       cpl_data_scale_reg,
-    input   wire[1:0]                       cpl_hdr_scale_reg,
-    input   wire[DLL_DATA_CREDS_WIDTH-1:0]  dll_data_creds,
-    input   wire[DLL_HDR_CREDS_WIDTH-1:0]   dll_hdr_creds,
-    input   wire[1:0]                       dll_data_scale,
-    input   wire[1:0]                       dll_hdr_scale,
-    input   wire                            dll_valid,
-    input   wire                            flow_control_en,
-    input   wire [1:0]                      dll_typ,
-    output  wire                            flow_control_error
+    input   wire    [FC_DATA_CREDS_WIDTH-1:0]   p_data_creds_reg,
+    input   wire    [FC_HDR_CREDS_WIDTH-1:0]    p_hdr_creds_reg,    
+    input   wire    [FC_DATA_CREDS_WIDTH-1:0]   np_data_creds_reg,
+    input   wire    [FC_HDR_CREDS_WIDTH-1:0]    np_hdr_creds_reg,  
+    input   wire    [FC_DATA_CREDS_WIDTH-1:0]   cpl_data_creds_reg,
+    input   wire    [FC_HDR_CREDS_WIDTH-1:0]    cpl_hdr_creds_reg,
+    input   wire    [1:0]                       p_data_scale_reg,
+    input   wire    [1:0]                       p_hdr_scale_reg,    
+    input   wire    [1:0]                       np_data_scale_reg,
+    input   wire    [1:0]                       np_hdr_scale_reg,    
+    input   wire    [1:0]                       cpl_data_scale_reg,
+    input   wire    [1:0]                       cpl_hdr_scale_reg,
+    input   wire    [DLL_DATA_CREDS_WIDTH-1:0]  dll_data_creds,
+    input   wire    [DLL_HDR_CREDS_WIDTH-1:0]   dll_hdr_creds,
+    input   wire    [1:0]                       dll_data_scale,
+    input   wire    [1:0]                       dll_hdr_scale,
+    input   wire                                dll_valid,
+    input   wire                                flow_control_en,
+    input   wire    [1:0]                       dll_typ,
+    output  wire                                flow_control_error
 );
 
     reg p_dll_valid;
@@ -74,7 +74,12 @@ module tl_rx_error_check_flow_control_top #(
         endcase
     end
 
-    tl_rx_error_check_flow_control u_p(
+    tl_rx_error_check_flow_control #(
+        .FC_DATA_CREDS_WIDTH(FC_DATA_CREDS_WIDTH),
+        .FC_HDR_CREDS_WIDTH(FC_HDR_CREDS_WIDTH),
+        .DLL_DATA_CREDS_WIDTH(DLL_DATA_CREDS_WIDTH),
+        .DLL_HDR_CREDS_WIDTH(DLL_HDR_CREDS_WIDTH)
+    )u_p(
         .data_creds_reg(p_data_creds_reg),
         .hdr_creds_reg(p_hdr_creds_reg),
         .data_scale_reg(p_data_scale_reg),
@@ -88,7 +93,12 @@ module tl_rx_error_check_flow_control_top #(
         .flow_control_error(p_flow_control_error)
     );
 
-    tl_rx_error_check_flow_control u_np(
+    tl_rx_error_check_flow_control #(
+        .FC_DATA_CREDS_WIDTH(FC_DATA_CREDS_WIDTH),
+        .FC_HDR_CREDS_WIDTH(FC_HDR_CREDS_WIDTH),
+        .DLL_DATA_CREDS_WIDTH(DLL_DATA_CREDS_WIDTH),
+        .DLL_HDR_CREDS_WIDTH(DLL_HDR_CREDS_WIDTH)
+    ) u_np (
         .data_creds_reg(np_data_creds_reg),
         .hdr_creds_reg(np_hdr_creds_reg),
         .data_scale_reg(np_data_scale_reg),
@@ -102,7 +112,12 @@ module tl_rx_error_check_flow_control_top #(
         .flow_control_error(np_flow_control_error)
     );
 
-    tl_rx_error_check_flow_control u_cpl(
+    tl_rx_error_check_flow_control #(
+        .FC_DATA_CREDS_WIDTH(FC_DATA_CREDS_WIDTH),
+        .FC_HDR_CREDS_WIDTH(FC_HDR_CREDS_WIDTH),
+        .DLL_DATA_CREDS_WIDTH(DLL_DATA_CREDS_WIDTH),
+        .DLL_HDR_CREDS_WIDTH(DLL_HDR_CREDS_WIDTH)
+    ) u_cpl (
         .data_creds_reg(cpl_data_creds_reg),
         .hdr_creds_reg(cpl_hdr_creds_reg),
         .data_scale_reg(cpl_data_scale_reg),
@@ -117,4 +132,5 @@ module tl_rx_error_check_flow_control_top #(
     );
 
     assign flow_control_error=p_flow_control_error||np_flow_control_error||cpl_flow_control_error;
+
 endmodule

@@ -1,8 +1,8 @@
 module tl_rx_error_check_flow_control #(
-    parameter FC_DATA_CREDS_WIDTH=16,
-    FC_HDR_CREDS_WIDTH=12,
-    DLL_DATA_CREDS_WIDTH=16,
-    DLL_HDR_CREDS_WIDTH=12
+    parameter   FC_DATA_CREDS_WIDTH=16,
+                FC_HDR_CREDS_WIDTH=12,
+                DLL_DATA_CREDS_WIDTH=16,
+                DLL_HDR_CREDS_WIDTH=12
 ) (
     input wire  [FC_DATA_CREDS_WIDTH-1:0]   data_creds_reg,
     input wire  [FC_HDR_CREDS_WIDTH-1:0]    hdr_creds_reg,

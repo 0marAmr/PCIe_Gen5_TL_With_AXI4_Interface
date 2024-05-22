@@ -1,5 +1,5 @@
 module tl_rx_error_check_unexpected_cpl #(
-    REQUESTER_ID_WIDTH=16,
+    parameter REQUESTER_ID_WIDTH=16,
     REQUESTER_TAG_WIDTH=10
 ) (
     input wire clk,

@@ -5,7 +5,7 @@ module tl_rx_error_check_ecrc (
     input wire ecrc_error_check,
     output wire ecrc_error
 );
-    assign ecrc_enable=ecrc_en&& TD &&ecrc_check_en_config;
-    assign ecrc_error = ecrc_enable ? ecrc_error_check:0;
+    assign ecrc_enable = ecrc_en& & TD &&ecrc_check_en_config;
+    assign ecrc_error = ecrc_enable? ecrc_error_check : 0;
     
 endmodule

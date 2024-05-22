@@ -1,6 +1,5 @@
 /* -----------------------------------------------------------------------------
-   Copyright (c) 2024 PCIe V5 graduation project under supervision of
-   Dr. Hosam Fahmy and Si vision company
+   Copyright (c) 2024 PCIe V5 graduation project
    -----------------------------------------------------------------------------
    FILE NAME :      PCIe_to_AXI_Map
    DEPARTMENT :     MASTER_BRIDGE
@@ -11,12 +10,7 @@
    VERSION  DATE        AUTHOR      DESCRIPTION
    1.0      2024-04-03             initial version
    -----------------------------------------------------------------------------
-   KEYWORDS : PCIe, General
-   -----------------------------------------------------------------------------
    PURPOSE :
-   -----------------------------------------------------------------------------
-   PARAMETERS
-   PARAM NAME               : RANGE  : DESCRIPTION                       : DEFAULT   : UNITS
    -----------------------------------------------------------------------------
    REUSE ISSUES
    Reset Strategy   : n/a
@@ -86,7 +80,8 @@ module master_bridge_async_fifo #(
         .FIFO_DEPTH(FIFO_DEPTH)
     ) U2_MEMORY (
         .CLK(i_w_clk),
-        .wclken((!o_w_full_flag && i_w_inc)),
+        .i_w_n_rst(i_w_n_rst),
+        .full_flag(o_w_full_flag),
         .wr_addr(wr_addr),
         .rd_addr(rd_addr),
         .wr_data(i_w_data),
