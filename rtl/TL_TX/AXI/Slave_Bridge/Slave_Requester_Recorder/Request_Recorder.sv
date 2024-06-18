@@ -33,10 +33,10 @@ logic [REQUESTER_RECORDER_WIDTH - 1 : 0] MEM [REQUESTER_RECORDER_DEPTH - 1: 0] ;
 
 
 // Read Request Port
-assign  rdreqport_if_wr.req_rd_data_wr = MEM[rdreqport_if_wr.req_rd_addr_wr];
+assign  rdreqport_if_wr.req_rd_data_wr = MEM[(rdreqport_if_wr.req_rd_addr_wr[REQUESTER_RECORDER_ADDR_WIDTH - 1 : 0])];
 
 // Read Request Port
-assign  rdreqport_if_rd.req_rd_data_rd = MEM[rdreqport_if_rd.req_rd_addr_rd];
+assign  rdreqport_if_rd.req_rd_data_rd = MEM[(rdreqport_if_rd.req_rd_addr_rd[REQUESTER_RECORDER_ADDR_WIDTH - 1 : 0])];
 
 // Read Response Port
 assign  respport_if.resp_rd_data = MEM[respport_if.resp_rd_addr];

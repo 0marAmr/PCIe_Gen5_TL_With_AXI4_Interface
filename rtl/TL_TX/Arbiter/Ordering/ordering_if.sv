@@ -11,6 +11,8 @@ inside PCIe with respect the axi ordering rules                      */
 /********************************************************************/
 // import package
 import Tx_Arbiter_Package::*;
+import axi_slave_package::*; 
+
 
 interface ordering_if ;
 
@@ -22,7 +24,7 @@ interface ordering_if ;
     /* Attr  - Attr [1:0] -- > IDO - RO - No Snoop */
     logic [REQUESTER_ID_WIDTH - 1 : 0]  first_trans_ID, second_trans_ID ;
     // parameter used only for configuration following poster --> need to know IO/CFG wr Completion
-    logic   [2:0]                       comp_typ; 
+    logic                                comp_typ; 
     /* Mapping: 001 --> IO_wr ,  010 --> CFG_wr , 011 --> MEM_wr ,  
                 100 --> IO_rd ,  101 --> CFG_rd , 110 --> MEM_rd */
 

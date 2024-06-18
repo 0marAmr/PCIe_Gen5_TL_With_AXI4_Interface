@@ -10,7 +10,7 @@
 /********************************************************************/
 // import the defined package for arbiter 
 import Tx_Arbiter_Package::*;
-import data_frag_package::*;
+import Fragmentation_Package::*;
 import axi_slave_package::*; 
 
 module arbiter_Top ( 
@@ -40,7 +40,7 @@ module arbiter_Top (
                     output logic                    rx_router_grant,
                     input  logic [1:0]              rx_router_valid, 
                         
-                    input logic [3*DW - 1 : 0]      rx_router_msg_hdr, // all msgs supported 3Dw
+                    input logic [4*DW - 1 : 0]      rx_router_msg_hdr, 
                     input logic [3*DW - 1 : 0]      rx_router_comp_hdr,
                     
                     // Data in case of COMPD
@@ -51,30 +51,35 @@ module arbiter_Top (
                     input FC_type_t                       TypeFC,
 
             // Output of buffer fragmentation 
-                    input logic                     start_fragment , 
-                    input logic                     Buffer_Ready , 
-                    buffer_frag_interface.arbiter_buffer frag_if
-
+                buffer_frag_interface.arbiter_buffer               buffer_if
 );
 
-  Tx_Arbiter_Sequence_Recorder seq_rec_if () ; 
+  Tx_Arbiter_Sequence_Recorder seq_rec_tx_arb_if (); 
+  Arbiter_FSM_Sequence_Recorder seq_rec_arbiter_fsm_if ();
+
   Tx_FC_Interface fc_if (); 
+  
   ordering_if ordering_if() ;  
 
 
 
     // Ordering Block
     ordering u_ordering (
-        ._if (ordering_if)
+        ._if (ordering_if.ORDERING_ARBITER_IF)
     );
 
     // FC Block 
     Tx_FC u_Tx_FC ( 
-        ._fc_dll (fc_if),
+        .clk(clk),
+        .arst(arst),
+        ._fc_arbiter(fc_if.FC_ARBITER),
         .HdrFC (HdrFC),
         .DataFC (DataFC),
         .TypeFC (TypeFC)
     );
+
+
+
 
     // Sequecne recorder handler
     Tx_Arbiter u_Tx_Arbiter ( 
@@ -84,15 +89,17 @@ module arbiter_Top (
         .a2p2_valid(a2p2_valid),
         .master_valid(master_valid),
         .rx_router_valid(rx_router_valid),
-        ._Sequence_Recorder_if(seq_rec_if)   
+        ._Sequence_Recorder_if(seq_rec_tx_arb_if.TX_ARBITER_SEQUENCE_RECORDER)   
     ); 
+
 
     
     // Sequence recorder buffer 
     Sequence_Recorder u_Sequence_Recorder ( 
         .clk(clk),
         .arst(arst),
-        ._if (seq_rec_if)
+        ._if_arbiter_fsm(seq_rec_arbiter_fsm_if.SEQUENCE_RECORDER_ARBITER_FSM),
+        ._if_tx_arbiter(seq_rec_tx_arb_if.SEQUENCE_RECORDER_TX_ARBITER)
     );
 
     // Arbiter FSM 
@@ -100,15 +107,13 @@ module arbiter_Top (
         .clk(clk),
         .arst(arst),
     // sequence recorder interface
-        .recorder_if(seq_rec_if),
+        .recorder_if(seq_rec_arbiter_fsm_if.ARBITER_FSM_SEQUENCE_RECORDER),
     // ordering interface 
-        .ordering_if(ordering_if),
+        .ordering_if(ordering_if.ARBITER_ORDERING_IF),
     // flow control interface
-        .fc_if(fc_if),
+        .fc_if(fc_if.ARBITER_FC),
     // TLP buffer interface 
-        .buffer_if(frag_if),
-        .Buffer_Ready(Buffer_Ready),
-        .start_fragment(start_fragment),
+        .buffer_if(buffer_if),
     // axi slave interface 
         .axi_req_wr_grant(axi_req_wr_grant),
         .axi_req_rd_grant(axi_req_rd_grant),
@@ -125,6 +130,7 @@ module arbiter_Top (
         .rx_router_comp_hdr(rx_router_comp_hdr),
         .rx_router_data(rx_router_data)
 );
+
 
 endmodule 
 

@@ -11,8 +11,8 @@ into one interface                              */
 
 
 module slave_internal_response_wr_mux (
-    Slave_Internal_Response_if.AW_TO_B                in_1_resp_wr_mux_if, // error
-    Slave_Internal_Response_if.AW_TO_B                in_2_resp_wr_mux_if, // posted
+    Slave_Internal_Response_if.B_TO_AW                in_1_resp_wr_mux_if, // error
+    Slave_Internal_Response_if.B_TO_AW                in_2_resp_wr_mux_if, // posted
 
     Slave_Internal_Response_if.AW_TO_B                out_resp_wr_mux_if
 ); 
@@ -33,7 +33,7 @@ always_comb begin
             out_resp_wr_mux_if.BRESP = INVALID;
             out_resp_wr_mux_if.BID = '0; 
          end 
-         2'b10 : begin 
+         2'b01 : begin 
             out_resp_wr_mux_if.BVALID = in_2_resp_wr_mux_if.BVALID;
             out_resp_wr_mux_if.BRESP   = in_2_resp_wr_mux_if.BRESP  ;
             out_resp_wr_mux_if.BID    = in_2_resp_wr_mux_if.BID   ;

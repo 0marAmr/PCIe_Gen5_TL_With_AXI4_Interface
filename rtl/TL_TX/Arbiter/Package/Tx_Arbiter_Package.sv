@@ -12,6 +12,9 @@
 
 package Tx_Arbiter_Package ;
 
+    localparam      FC_HDR_WIDTH    = 12,
+                    FC_DATA_WIDTH   = 16; 
+
     /******************** Tx Arbiter Sources Encoding ********************/
     typedef enum logic [2:0] {
         NO_SOURCE,
@@ -23,14 +26,14 @@ package Tx_Arbiter_Package ;
     } Tx_Arbiter_Sources_t;
     
     /******************** Boolean Type ********************/
-    typedef enum logic {
-        FALSE,
-        TRUE
-    } bool_t; 
+    // typedef enum logic {
+    //     FALSE,
+    //     TRUE
+    // } bool_t; 
 
     /******************** Request Recorder Parameters ********************/
-    parameter   DATA_WIDTH      = 3,
-                FIFO_DEPTH      = 4;
+    localparam      SEQ_DATA_WIDTH      = 3,
+                    SEQ_FIFO_DEPTH      = 8; // consider rx router is 2 srcs 
 
 
     /******************** Request_type Type ********************/
@@ -42,12 +45,12 @@ package Tx_Arbiter_Package ;
     } Req_Type_t;
 
     /******************** Ordering Parameters ********************/
-    parameter   TRANS_ID_WIDTH          = 24    ,
-                REQUESTER_ID_WIDTH      = 16    ;
+    // parameter   TRANS_ID_WIDTH          = 24    ,
+    //             REQUESTER_ID_WIDTH      = 16    ;
                 
     /******************** Ordering Parameters ********************/
-    parameter   TRANS_ID_WIDTH          = 24    ,
-                REQUESTER_ID_WIDTH      = 16    ;
+  //  parameter   TRANS_ID_WIDTH          = 24    ,
+  //              REQUESTER_ID_WIDTH      = 16    ;
                 
     
     /******************** FC Type Encoding ********************/
@@ -56,7 +59,7 @@ package Tx_Arbiter_Package ;
                     FC_NP,     // 01
                     FC_CPL,    // 10
                     FC_X
-                } FC_type_t;
+        } FC_type_t;
             
                 /******************** FC Command Encoding ********************/
                 /* 000 >> check FC_P_H      for TLP                    */
@@ -68,39 +71,34 @@ package Tx_Arbiter_Package ;
                 /* 110 >> check FC_P_H      for TLP                    */
                 /* 111 >> check FC_P_H      for TLP                    */
                 typedef enum logic [2:0] {
+					FC_DEFAULT,
 					FC_P_H,
 					FC_P_D,
 					FC_NP_H,
 					FC_NP_D,
 					FC_CPL_H,
 					FC_CPL_D,
-					FC_ERR,
-					FC_DEFAULT
+					FC_ERR
 				} FC_command_t;
             
                 /******************** FC Result Encoding ********************/
-                typedef enum logic [1:0] {
+                typedef enum logic [2:0] {
                     FC_INVALID,
-                    FC_FAILED,
                     FC_SUCCESS_1,
                     FC_SUCCESS_2,
-                    FC_SUCCESS_1_2
+                    FC_SUCCESS_1_2,
+					FC_FAILED
                 } FC_result_t;
             
             
                 /********************** FSM of Arbiter **********************/
-                typdef enum logic [2:0] {
-                    IDLE,
+                typedef enum logic [2:0] {
+                    ARBITER_IDLE,
                     TLP1_HDR,  // 1-  Check FC + Ordering, 2- Selection Done, 3- First Cycle of storing inside TLP Buffer 
                     TLP1_Data, // 1-  Only storing all Data of TLP1
                     TLP2_HDR,  // 1- First Cycle of storing inside TLP Buffer 
                     TLP2_Data  // 1-  Only storing all Data of TLP2 
                 } arbiter_state;
 
-                
-                
-                
-                
-
-endpackage: Tx_Arbiter_Package
+endpackage
 

@@ -10,7 +10,6 @@ interface Sync_FIFO_Interface #(
     parameter   DATA_WIDTH      = 8,
                 FIFO_DEPTH      = 4,
                 ADDR_WIDTH      = $clog2(FIFO_DEPTH) 
-)(
 );
     logic [DATA_WIDTH - 1 : 0]  FIFO_wr_data;
     logic [DATA_WIDTH - 1 : 0]  FIFO_rd_data;

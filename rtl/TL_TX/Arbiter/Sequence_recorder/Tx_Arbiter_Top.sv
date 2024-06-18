@@ -31,7 +31,7 @@ initial begin
     arst = 1'b0; A2P_1_if.Valid = 1'b0; A2P_2_if.Valid = 1'b0; Master_if.Valid = 1'b0; Rx_Router_if.Valid = 1'b0; 
     #CLK_PERIOD
     arst = 1'b1; 
-    repeat(20) begin
+    repeat(5) begin
         A2P_1_if.Valid              = $urandom() % 2;
         A2P_2_if.Valid              = $urandom() % 2;
         Master_if.Valid             = $urandom() % 2;

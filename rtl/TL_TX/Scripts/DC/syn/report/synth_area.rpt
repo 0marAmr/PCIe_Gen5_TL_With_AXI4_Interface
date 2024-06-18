@@ -1,0 +1,31 @@
+ 
+****************************************
+Report : area
+Design : data_frag_top
+Version: O-2018.06-SP1
+Date   : Tue May 21 01:49:39 2024
+****************************************
+
+Information: Updating design information... (UID-85)
+Library(s) Used:
+
+    saed32hvt_ff0p95v125c (File: /home/ICer/Desktop/Final-Project/SAED32_2012-12-25/lib/stdcell_hvt/db_nldm/saed32hvt_ff0p95v125c.db)
+
+Number of ports:                         4184
+Number of nets:                        138872
+Number of cells:                       134919
+Number of combinational cells:         132241
+Number of sequential cells:              2674
+Number of macros/black boxes:               0
+Number of buf/inv:                      22797
+Number of references:                       3
+
+Combinational area:             350088.192634
+Buf/Inv area:                    37858.562004
+Noncombinational area:           19021.153866
+Macro/Black Box area:                0.000000
+Net Interconnect area:          509820.391179
+
+Total cell area:                369109.346500
+Total area:                     878929.737680
+1

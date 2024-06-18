@@ -13,12 +13,16 @@ inside PCIe with respect the axi ordering rules                      */
 
 // import package
 import Tx_Arbiter_Package::*;
+import axi_slave_package::*; 
+
 
 // Module
 module ordering (
 
         ordering_if.ORDERING_ARBITER_IF _if 
 );
+logic IDO_set;
+logic RO_set;
 
 assign IDO_set = _if.first_IDO && _if.second_IDO ; 
 assign RO_set = _if.first_RO && _if.second_RO ;
@@ -65,8 +69,8 @@ end
                         Posted_Req : begin 
                                 if (RO_set) begin 
                                         _if.ordering_result = TRUE ;
-                                    end 
-                                    else if (IDO_set) begin 
+                                end 
+                                else if (IDO_set) begin 
                                         if (_if.first_trans_ID != _if.second_trans_ID) begin 
                                                 _if.ordering_result = TRUE ;
                                         end 
@@ -74,7 +78,7 @@ end
                                                 _if.ordering_result = FALSE ;
                                         end 
                                     end 
-                                    else 
+                                else 
                                     _if.ordering_result = FALSE ;  
                         end 
                         Non_Posted_Req : begin 
@@ -94,7 +98,8 @@ end
                                 if (RO_set) begin 
                                         _if.ordering_result = TRUE ;
                                     end
-                                else if ((_if.comp_typ == 3'b001) || (_if.comp_typ == 3'b010)) begin 
+                                else if (_if.comp_typ) begin 
+                                // else if ((_if.comp_typ == 3'b001) || (_if.comp_typ == 3'b010)) begin 
                                         _if.ordering_result = TRUE ;
                                     end
                                 else if (IDO_set) begin 

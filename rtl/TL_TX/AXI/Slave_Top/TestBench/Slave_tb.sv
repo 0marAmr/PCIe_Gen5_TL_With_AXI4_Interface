@@ -123,11 +123,7 @@ endfunction
                         u_axi_if.AWVALID = AWVALID;
                         u_axi_if.AWUSER = AWUSER;
                         u_axi_if.AWBURST = AWBURST;
-
-
-
-        end 
-        
+        end
     endtask
 
     task Write_request_W (  input int WID, input int WDATA, input int WSTRB, input int WVALID, 

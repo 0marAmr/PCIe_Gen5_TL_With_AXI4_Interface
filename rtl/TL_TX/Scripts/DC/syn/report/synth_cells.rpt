@@ -1,0 +1,30 @@
+ 
+****************************************
+Report : cell
+Design : data_frag_top
+Version: O-2018.06-SP1
+Date   : Tue May 21 01:49:47 2024
+****************************************
+
+Attributes:
+    b - black box (unknown)
+    h - hierarchical
+    n - noncombinational
+    p - parameterized
+    r - removable
+    u - contains unmapped logic
+
+Cell                      Reference       Library             Area  Attributes
+--------------------------------------------------------------------------------
+u_ECRC                    ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                                                          25305.117624
+                                                                    h, n, p
+u_Frag                    Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                                                          5130.405059
+                                                                    h, n, p
+u_buffer_frag             buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                                                          338673.823817
+                                                                    h, n, p
+--------------------------------------------------------------------------------
+Total 3 cells                                             369109.346500
+1

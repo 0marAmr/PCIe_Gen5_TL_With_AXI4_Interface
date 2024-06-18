@@ -21,20 +21,20 @@ add wave -noupdate -expand -group Sequence_Recorder /Tx_Arbiter_Top/Sequence_Rec
 add wave -noupdate -expand -group Sequence_Recorder -radix unsigned /Tx_Arbiter_Top/Sequence_Recorder_if/available
 add wave -noupdate -expand -group Sequence_Recorder -radix unsigned /Tx_Arbiter_Top/u_Sequence_Recorder/wr_ptr
 add wave -noupdate -expand -group Sequence_Recorder -radix unsigned /Tx_Arbiter_Top/u_Sequence_Recorder/rd_ptr
-add wave -noupdate -expand -group Sequence_Recorder -expand /Tx_Arbiter_Top/u_Sequence_Recorder/MEM
+add wave -noupdate -expand -group Sequence_Recorder -radixenum numeric -expand /Tx_Arbiter_Top/u_Sequence_Recorder/MEM
 add wave -noupdate -expand -group Valid_Positive_Edge /Tx_Arbiter_Top/u_Tx_Arbiter/A2P_1_pe_valid
 add wave -noupdate -expand -group Valid_Positive_Edge /Tx_Arbiter_Top/u_Tx_Arbiter/A2P_2_pe_valid
 add wave -noupdate -expand -group Valid_Positive_Edge /Tx_Arbiter_Top/u_Tx_Arbiter/Master_pe_valid
 add wave -noupdate -expand -group Valid_Positive_Edge /Tx_Arbiter_Top/u_Tx_Arbiter/Rx_Router_pe_valid
-add wave -noupdate -expand -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/Rx_Router_delayed_valid
-add wave -noupdate -expand -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/Master_delayed_valid
-add wave -noupdate -expand -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/A2P_2_delayed_valid
-add wave -noupdate -expand -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/A2P_1_delayed_valid
+add wave -noupdate -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/Rx_Router_delayed_valid
+add wave -noupdate -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/Master_delayed_valid
+add wave -noupdate -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/A2P_2_delayed_valid
+add wave -noupdate -group Valid_Delayed_Version /Tx_Arbiter_Top/u_Tx_Arbiter/A2P_1_delayed_valid
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {122 ps} 0}
+WaveRestoreCursors {{Cursor 1} {27 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 202
-configure wave -valuecolwidth 100
+configure wave -valuecolwidth 120
 configure wave -justifyvalue left
 configure wave -signalnamewidth 1
 configure wave -snapdistance 10
@@ -47,4 +47,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {347 ps}
+WaveRestoreZoom {0 ps} {82 ps}

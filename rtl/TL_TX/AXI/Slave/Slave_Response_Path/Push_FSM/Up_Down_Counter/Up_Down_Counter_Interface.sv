@@ -9,8 +9,6 @@
 interface Up_Down_Counter_Interface #(
     parameter   MAX_COUNT       = 8,
                 COUNT_WIDTH     = $clog2(MAX_COUNT) 
-)(
-    
 );
     import axi_slave_package::*;
     logic En;                                       // counter enable to count up or down

@@ -1,0 +1,689 @@
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 10
+Design : data_frag_top
+Version: O-2018.06-SP1
+Date   : Tue May 21 01:49:47 2024
+****************************************
+
+Operating Conditions: ff0p95v125c   Library: saed32hvt_ff0p95v125c
+Wire Load Model Mode: enclosed
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[210]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U2770/Y (XNOR3X1_HVT)                            0.15    2470.24 r
+  u_ECRC/U2769/Y (XNOR3X1_HVT)                            0.08    2470.31 f
+  u_ECRC/U2768/Y (XNOR3X1_HVT)                            0.07    2470.38 r
+  u_ECRC/U2767/Y (XNOR3X1_HVT)                            0.08    2470.46 f
+  u_ECRC/U2766/Y (XNOR3X1_HVT)                            0.07    2470.53 r
+  u_ECRC/U2765/Y (XNOR3X1_HVT)                            0.08    2470.60 f
+  u_ECRC/U2764/Y (XOR2X1_HVT)                             0.09    2470.69 r
+  u_ECRC/U2745/Y (OA22X1_HVT)                             0.05    2470.74 r
+  u_ECRC/U2744/Y (NAND4X0_HVT)                            0.11    2470.85 f
+  u_ECRC/_if.ecrc_Result_comb[18] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.85 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.85 f
+  u_Frag/U949/Y (AO222X1_HVT)                            18.65    2489.50 f
+  u_Frag/_dll_if.TLP[210] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.50 f
+  _dll_if.TLP[210] (out)                                  0.29    2489.79 f
+  data arrival time                                               2489.79
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[178]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U2770/Y (XNOR3X1_HVT)                            0.15    2470.24 r
+  u_ECRC/U2769/Y (XNOR3X1_HVT)                            0.08    2470.31 f
+  u_ECRC/U2768/Y (XNOR3X1_HVT)                            0.07    2470.38 r
+  u_ECRC/U2767/Y (XNOR3X1_HVT)                            0.08    2470.46 f
+  u_ECRC/U2766/Y (XNOR3X1_HVT)                            0.07    2470.53 r
+  u_ECRC/U2765/Y (XNOR3X1_HVT)                            0.08    2470.60 f
+  u_ECRC/U2764/Y (XOR2X1_HVT)                             0.09    2470.69 r
+  u_ECRC/U2745/Y (OA22X1_HVT)                             0.05    2470.74 r
+  u_ECRC/U2744/Y (NAND4X0_HVT)                            0.11    2470.85 f
+  u_ECRC/_if.ecrc_Result_comb[18] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.85 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.85 f
+  u_Frag/U986/Y (AO222X1_HVT)                            18.65    2489.50 f
+  u_Frag/_dll_if.TLP[178] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.50 f
+  _dll_if.TLP[178] (out)                                  0.29    2489.79 f
+  data arrival time                                               2489.79
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[146]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U2770/Y (XNOR3X1_HVT)                            0.15    2470.24 r
+  u_ECRC/U2769/Y (XNOR3X1_HVT)                            0.08    2470.31 f
+  u_ECRC/U2768/Y (XNOR3X1_HVT)                            0.07    2470.38 r
+  u_ECRC/U2767/Y (XNOR3X1_HVT)                            0.08    2470.46 f
+  u_ECRC/U2766/Y (XNOR3X1_HVT)                            0.07    2470.53 r
+  u_ECRC/U2765/Y (XNOR3X1_HVT)                            0.08    2470.60 f
+  u_ECRC/U2764/Y (XOR2X1_HVT)                             0.09    2470.69 r
+  u_ECRC/U2745/Y (OA22X1_HVT)                             0.05    2470.74 r
+  u_ECRC/U2744/Y (NAND4X0_HVT)                            0.11    2470.85 f
+  u_ECRC/_if.ecrc_Result_comb[18] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.85 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.85 f
+  u_Frag/U1024/Y (AO222X1_HVT)                           18.65    2489.50 f
+  u_Frag/_dll_if.TLP[146] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.50 f
+  _dll_if.TLP[146] (out)                                  0.29    2489.79 f
+  data arrival time                                               2489.79
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[114]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U2770/Y (XNOR3X1_HVT)                            0.15    2470.24 r
+  u_ECRC/U2769/Y (XNOR3X1_HVT)                            0.08    2470.31 f
+  u_ECRC/U2768/Y (XNOR3X1_HVT)                            0.07    2470.38 r
+  u_ECRC/U2767/Y (XNOR3X1_HVT)                            0.08    2470.46 f
+  u_ECRC/U2766/Y (XNOR3X1_HVT)                            0.07    2470.53 r
+  u_ECRC/U2765/Y (XNOR3X1_HVT)                            0.08    2470.60 f
+  u_ECRC/U2764/Y (XOR2X1_HVT)                             0.09    2470.69 r
+  u_ECRC/U2745/Y (OA22X1_HVT)                             0.05    2470.74 r
+  u_ECRC/U2744/Y (NAND4X0_HVT)                            0.11    2470.85 f
+  u_ECRC/_if.ecrc_Result_comb[18] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.85 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.85 f
+  u_Frag/U1062/Y (AO222X1_HVT)                           18.65    2489.50 f
+  u_Frag/_dll_if.TLP[114] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.50 f
+  _dll_if.TLP[114] (out)                                  0.29    2489.79 f
+  data arrival time                                               2489.79
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[82]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U2770/Y (XNOR3X1_HVT)                            0.15    2470.24 r
+  u_ECRC/U2769/Y (XNOR3X1_HVT)                            0.08    2470.31 f
+  u_ECRC/U2768/Y (XNOR3X1_HVT)                            0.07    2470.38 r
+  u_ECRC/U2767/Y (XNOR3X1_HVT)                            0.08    2470.46 f
+  u_ECRC/U2766/Y (XNOR3X1_HVT)                            0.07    2470.53 r
+  u_ECRC/U2765/Y (XNOR3X1_HVT)                            0.08    2470.60 f
+  u_ECRC/U2764/Y (XOR2X1_HVT)                             0.09    2470.69 r
+  u_ECRC/U2745/Y (OA22X1_HVT)                             0.05    2470.74 r
+  u_ECRC/U2744/Y (NAND4X0_HVT)                            0.11    2470.85 f
+  u_ECRC/_if.ecrc_Result_comb[18] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.85 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.85 f
+  u_Frag/U834/Y (AO222X1_HVT)                            18.65    2489.50 f
+  u_Frag/_dll_if.TLP[82] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.50 f
+  _dll_if.TLP[82] (out)                                   0.29    2489.79 f
+  data arrival time                                               2489.79
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[50]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U2770/Y (XNOR3X1_HVT)                            0.15    2470.24 r
+  u_ECRC/U2769/Y (XNOR3X1_HVT)                            0.08    2470.31 f
+  u_ECRC/U2768/Y (XNOR3X1_HVT)                            0.07    2470.38 r
+  u_ECRC/U2767/Y (XNOR3X1_HVT)                            0.08    2470.46 f
+  u_ECRC/U2766/Y (XNOR3X1_HVT)                            0.07    2470.53 r
+  u_ECRC/U2765/Y (XNOR3X1_HVT)                            0.08    2470.60 f
+  u_ECRC/U2764/Y (XOR2X1_HVT)                             0.09    2470.69 r
+  u_ECRC/U2745/Y (OA22X1_HVT)                             0.05    2470.74 r
+  u_ECRC/U2744/Y (NAND4X0_HVT)                            0.11    2470.85 f
+  u_ECRC/_if.ecrc_Result_comb[18] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.85 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.85 f
+  u_Frag/U869/Y (AO222X1_HVT)                            18.65    2489.50 f
+  u_Frag/_dll_if.TLP[50] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.50 f
+  _dll_if.TLP[50] (out)                                   0.29    2489.79 f
+  data arrival time                                               2489.79
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[18]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U2770/Y (XNOR3X1_HVT)                            0.15    2470.24 r
+  u_ECRC/U2769/Y (XNOR3X1_HVT)                            0.08    2470.31 f
+  u_ECRC/U2768/Y (XNOR3X1_HVT)                            0.07    2470.38 r
+  u_ECRC/U2767/Y (XNOR3X1_HVT)                            0.08    2470.46 f
+  u_ECRC/U2766/Y (XNOR3X1_HVT)                            0.07    2470.53 r
+  u_ECRC/U2765/Y (XNOR3X1_HVT)                            0.08    2470.60 f
+  u_ECRC/U2764/Y (XOR2X1_HVT)                             0.09    2470.69 r
+  u_ECRC/U2745/Y (OA22X1_HVT)                             0.05    2470.74 r
+  u_ECRC/U2744/Y (NAND4X0_HVT)                            0.11    2470.85 f
+  u_ECRC/_if.ecrc_Result_comb[18] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.85 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.85 f
+  u_Frag/U973/Y (AO222X1_HVT)                            18.65    2489.50 f
+  u_Frag/_dll_if.TLP[18] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.50 f
+  _dll_if.TLP[18] (out)                                   0.29    2489.79 f
+  data arrival time                                               2489.79
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[220]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U1352/Y (XNOR2X1_HVT)                            0.17    2470.26 r
+  u_ECRC/U1351/Y (XNOR3X1_HVT)                            0.07    2470.32 r
+  u_ECRC/U1350/Y (XNOR3X1_HVT)                            0.08    2470.40 f
+  u_ECRC/U1349/Y (XNOR3X1_HVT)                            0.07    2470.47 f
+  u_ECRC/U1346/Y (XOR2X1_HVT)                             0.08    2470.55 r
+  u_ECRC/U1345/Y (OA22X1_HVT)                             0.05    2470.60 r
+  u_ECRC/U1285/Y (NAND4X0_HVT)                            0.10    2470.70 f
+  u_ECRC/_if.ecrc_Result_comb[28] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.70 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[28] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.70 f
+  u_Frag/U938/Y (AO222X1_HVT)                            18.65    2489.36 f
+  u_Frag/_dll_if.TLP[220] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.36 f
+  _dll_if.TLP[220] (out)                                  0.29    2489.64 f
+  data arrival time                                               2489.64
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[188]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U1352/Y (XNOR2X1_HVT)                            0.17    2470.26 r
+  u_ECRC/U1351/Y (XNOR3X1_HVT)                            0.07    2470.32 r
+  u_ECRC/U1350/Y (XNOR3X1_HVT)                            0.08    2470.40 f
+  u_ECRC/U1349/Y (XNOR3X1_HVT)                            0.07    2470.47 f
+  u_ECRC/U1346/Y (XOR2X1_HVT)                             0.08    2470.55 r
+  u_ECRC/U1345/Y (OA22X1_HVT)                             0.05    2470.60 r
+  u_ECRC/U1285/Y (NAND4X0_HVT)                            0.10    2470.70 f
+  u_ECRC/_if.ecrc_Result_comb[28] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.70 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[28] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.70 f
+  u_Frag/U975/Y (AO222X1_HVT)                            18.65    2489.36 f
+  u_Frag/_dll_if.TLP[188] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.36 f
+  _dll_if.TLP[188] (out)                                  0.29    2489.64 f
+  data arrival time                                               2489.64
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+  Startpoint: u_buffer_frag/_Dist_if.rd_data_1_reg[113]
+              (rising edge-triggered flip-flop)
+  Endpoint: _dll_if.TLP[156]
+            (output port)
+  Path Group: (none)
+  Path Type: max
+
+  Des/Clust/Port     Wire Load Model       Library
+  ------------------------------------------------
+  buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_
+                     540000                saed32hvt_ff0p95v125c
+  data_frag_top      540000                saed32hvt_ff0p95v125c
+  Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_
+                     8000                  saed32hvt_ff0p95v125c
+  ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_
+                     35000                 saed32hvt_ff0p95v125c
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/CLK (DFFARX1_HVT)
+                                                          0.00       0.00 r
+  u_buffer_frag/_Dist_if.rd_data_1_reg[113]/Q (DFFARX1_HVT)
+                                                          0.12       0.12 r
+  u_buffer_frag/_Dist_if.rd_data_1[113] (buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_)
+                                                          0.00       0.12 r
+  u_Frag/_tlp_fifo_if.rd_data_1[113] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00       0.12 r
+  u_Frag/U1149/Y (NAND2X0_HVT)                           27.19      27.30 f
+  u_Frag/U1147/Y (NAND3X0_HVT)                            0.28      27.58 r
+  u_Frag/U1097/Y (INVX0_HVT)                              0.15      27.73 f
+  u_Frag/U1085/Y (NAND2X0_HVT)                            0.08      27.81 r
+  u_Frag/U66/Y (NAND3X4_HVT)                              0.20      28.01 f
+  u_Frag/U773/Y (OR2X1_HVT)                              56.14      84.15 f
+  u_Frag/U28/Y (INVX0_HVT)                                2.77      86.93 r
+  u_Frag/U29/Y (INVX8_HVT)                                0.56      87.48 f
+  u_Frag/_ecrc_if.ecrc_Seed_Load (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00      87.48 f
+  u_ECRC/_if.ecrc_Seed_Load (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00      87.48 f
+  u_ECRC/U5369/Y (MUX21X1_HVT)                         2364.87    2452.35 r
+  u_ECRC/U5368/Y (INVX0_HVT)                              1.63    2453.99 f
+  u_ECRC/U110/Y (XNOR2X2_HVT)                             2.62    2456.61 f
+  u_ECRC/U3916/Y (XOR2X1_HVT)                            11.25    2467.86 r
+  u_ECRC/U3832/Y (INVX0_HVT)                              0.26    2468.12 f
+  u_ECRC/U2838/Y (XNOR2X1_HVT)                            1.38    2469.50 f
+  u_ECRC/U2771/Y (XNOR2X1_HVT)                            0.59    2470.09 r
+  u_ECRC/U1352/Y (XNOR2X1_HVT)                            0.17    2470.26 r
+  u_ECRC/U1351/Y (XNOR3X1_HVT)                            0.07    2470.32 r
+  u_ECRC/U1350/Y (XNOR3X1_HVT)                            0.08    2470.40 f
+  u_ECRC/U1349/Y (XNOR3X1_HVT)                            0.07    2470.47 f
+  u_ECRC/U1346/Y (XOR2X1_HVT)                             0.08    2470.55 r
+  u_ECRC/U1345/Y (OA22X1_HVT)                             0.05    2470.60 r
+  u_ECRC/U1285/Y (NAND4X0_HVT)                            0.10    2470.70 f
+  u_ECRC/_if.ecrc_Result_comb[28] (ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_)
+                                                          0.00    2470.70 f
+  u_Frag/_ecrc_if.ecrc_Result_comb[28] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2470.70 f
+  u_Frag/U1013/Y (AO222X1_HVT)                           18.65    2489.36 f
+  u_Frag/_dll_if.TLP[156] (Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_)
+                                                          0.00    2489.36 f
+  _dll_if.TLP[156] (out)                                  0.29    2489.64 f
+  data arrival time                                               2489.64
+  --------------------------------------------------------------------------
+  (Path is unconstrained)
+
+
+1

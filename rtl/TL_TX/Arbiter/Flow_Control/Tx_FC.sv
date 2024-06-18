@@ -6,6 +6,8 @@
 /* Dependencies	: -								*/
 /* Used			: -							    */
 /* Future Work  :                               */
+/* Parameters */
+import Tx_Arbiter_Package::*;
 module Tx_FC # (
     parameter   FC_HDR_WIDTH    = 12,
                 FC_DATA_WIDTH   = 16                
@@ -41,493 +43,353 @@ logic [FC_DATA_WIDTH - 1 : 0] CL_NonPosted_Data;
 logic [FC_HDR_WIDTH  - 1 : 0] CL_Completion_Hdr; 
 logic [FC_DATA_WIDTH - 1 : 0] CL_Completion_Data; 
 
-/* Useful Functions */
-// 1st: Check Hdr
-function FC_result_t FC_Hdr_Check_Update (
-    input logic [FC_HDR_WIDTH - 1 : 0]  CL_1, 
-    inout logic [FC_HDR_WIDTH - 1 : 0]  CC_1,
-    input logic                         check_both
-);
-    FC_result_t Result;
-    Result  = FC_FAILED;
-    if ((CL_1 >= (CC_1 + 2)) && check_both) begin
-        CC_1    = (CC_1 + 2);
-        Result  = FC_SUCCESS_1_2;
-    end
-    else if ((CL_1 >= (CC_1 + 1))) begin
-        CC_1    = (CC_1 + 1);
-        Result  = FC_SUCCESS_1;
-    end
-    return Result;
-endfunction
 
-// 1st: Check Hdr
-// 2nd: Check Hdr
-function FC_result_t FC_Hdr_Hdr_Check_Update (
-    input logic [FC_HDR_WIDTH - 1 : 0]          CL_1, 
-    inout logic [FC_HDR_WIDTH - 1 : 0]          CC_1, 
-    input logic [FC_HDR_WIDTH - 1 : 0]          CL_2, 
-    inout logic [FC_HDR_WIDTH - 1 : 0]          CC_2
-);
-    FC_result_t Result;
-    Result  = FC_FAILED;
-    if (((CL_1 >= (CC_1 + 1))) && ((CL_2 >= (CC_2 + 1)))) begin
-        CC_1    = (CC_1 + 1);
-        CC_2    = (CC_2 + 1);               
-        Result  = FC_SUCCESS_1_2;    
-    end        
-    else if ((CL_1 >= (CC_1 + 1))) begin
-        CC_1    = (CC_1 + 1);
-        Result  = FC_SUCCESS_1;
-    end
-    else if ((CL_2 >= (CC_2 + 1))) begin
-        CC_2    = CC_2 + 1;        
-        Result  = FC_SUCCESS_2;
-    end
-    return Result;
-endfunction
-
-
-// 1st: Check Data
-function FC_result_t FC_Data_Check_Update (  
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
-    input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
-    inout logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
-    input logic [9:0]                           PTLP_1,
-    input logic [9:0]                           PTLP_2,
-    input logic                                 check_both
-);
-    FC_result_t Result;
-    Result = FC_FAILED;
-    if ((CL_H_1 >= (CC_H_1 + 2)) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1) + FC_PTLP_Conv(PTLP_2)))) && check_both) begin
-        CC_H_1      = (CC_H_1 + 2);
-        CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1) + FC_PTLP_Conv(PTLP_2));
-        Result      = FC_SUCCESS_1_2;
-    end
-    else if ((CL_H_1 >= (CC_H_1 + 1)) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
-        CC_H_1      = (CC_H_1 + 1);
-        CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        Result      = FC_SUCCESS_1;
-    end
-    return Result;
-endfunction
-
-
-// 1st: Check Data
-// 2nd: Check Data
-function FC_result_t FC_Data_Data_Check_Update (  
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
-    input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
-    inout logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
-    input logic [9:0]                           PTLP_1,
-
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
-    input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
-    inout logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_2,
-    input logic [9:0]                           PTLP_2
-);
-    FC_result_t Result;
-    Result   = FC_FAILED;
-    if ((CL_H_1 >= (CC_H_1 + 1)) && (CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1)))  && (CL_H_2 >= (CC_H_2 + 1)) && (CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2)))) begin
-        CC_H_1      = (CC_H_1 + 1);
-        CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        CC_H_2      = (CC_H_2 + 1);
-        CC_D_2      = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-        Result      = FC_SUCCESS_1_2;
-    end
-    else if ((CL_H_1 >= (CC_H_1 + 1)) && (CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1)))) begin
-        CC_H_1      = (CC_H_1 + 1);
-        CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        Result      = FC_SUCCESS_1;
-    end
-    else if ((CL_H_2 >= (CC_H_2 + 1)) && (CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2)))) begin
-        CC_H_2      = (CC_H_2 + 1);
-        CC_D_2      = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-        Result      = FC_SUCCESS_2;
-    end
-    return Result;
-endfunction
-
-
-// 1st: Check Hdr
-// 2nd: Check Data
-function FC_result_t FC_Hdr_Data_Check_Update (  
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
-
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
-    input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
-    inout logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_2,
-    input logic [9:0]                           PTLP_2,
-    input FC_command_t                          Command_1,
-    input FC_command_t                          Command_2
-);
-    FC_result_t Result;
-    Result  = FC_FAILED;
-    // check if command 1 and command 2 with same type (P, NP, Cpl)
-    if ((((Command_1 == FC_P_H) && (Command_2 == FC_P_D)) || ((Command_1 == FC_NP_H) && (Command_2 == FC_NP_D)) || ((Command_1 == FC_CPL_H) && (Command_2 == FC_CPL_D)))   
-                &&
-       ((CL_H_1 >= (CC_H_1 + 2)) && ((CL_H_2 >= (CC_H_2 + 2))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) 
-     ) begin
-        CC_H_1      = (CC_H_1 + 2);    
-        CC_H_2      = (CC_H_2 + 2);
-        CC_D_2      = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-        Result      = FC_SUCCESS_1_2;
-     end
-    else if (!(((Command_1 == FC_P_H) && (Command_2 == FC_P_D)) || ((Command_1 == FC_NP_H) && (Command_2 == FC_NP_D)) || ((Command_1 == FC_CPL_H) && (Command_2 == FC_CPL_D)))   
-                &&
-       ((CL_H_1 >= (CC_H_1 + 1)) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) 
-     ) begin
-        CC_H_1      = (CC_H_1 + 1);    
-        CC_H_2      = (CC_H_2 + 1);            
-        CC_D_2      = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-        Result      = FC_SUCCESS_1_2;
-    end
-    else if ((CL_H_1 >= (CC_H_1 + 1))) begin
-        CC_H_1      = (CC_H_1 + 1);
-        if (((Command_1 == FC_P_H) && (Command_2 == FC_P_D)) || ((Command_1 == FC_NP_H) && (Command_2 == FC_NP_D)) || ((Command_1 == FC_CPL_H) && (Command_2 == FC_CPL_D))) begin
-            CC_H_2      = (CC_H_2 + 1);                
+/////////////////// Functions ///////////////////////
+    /* Useful Functions */
+    // 1st: Check Hdr
+    function FC_result_t FC_Hdr_Check (
+        input logic [FC_HDR_WIDTH - 1 : 0]  CL_1, 
+        input logic [FC_HDR_WIDTH - 1 : 0]  CC_1,
+        input logic                         check_both
+    );
+        FC_result_t Result;
+        Result  = FC_FAILED;
+        if ((CL_1 >= (CC_1 + 2)) && check_both) begin
+            Result  = FC_SUCCESS_1_2;
         end
-        Result      = FC_SUCCESS_1;
-    end
-    else begin
-        if (((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
-            CC_H_2      = (CC_H_2 + 1);
-            CC_D_2      = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-            if (((Command_1 == FC_P_H) && (Command_2 == FC_P_D)) || ((Command_1 == FC_NP_H) && (Command_2 == FC_NP_D)) || ((Command_1 == FC_CPL_H) && (Command_2 == FC_CPL_D))) begin
-                CC_H_1      = (CC_H_1 + 1);                
-            end
-            Result      = FC_SUCCESS_2;
+        else if ((CL_1 >= (CC_1 + 1))) begin
+            Result  = FC_SUCCESS_1;
         end
-    end
-    return Result;
-endfunction
+        return Result;
+    endfunction
+
+    // 1st: Check Hdr
+    // 2nd: Check Hdr
+    function FC_result_t FC_Hdr_Hdr_Check (
+        input logic [FC_HDR_WIDTH - 1 : 0]          CL_1, 
+        input logic [FC_HDR_WIDTH - 1 : 0]          CC_1, 
+        input logic [FC_HDR_WIDTH - 1 : 0]          CL_2, 
+        input logic [FC_HDR_WIDTH - 1 : 0]          CC_2
+    );
+        FC_result_t Result;
+        Result  = FC_FAILED;
+        if (((CL_1 >= (CC_1 + 1))) && ((CL_2 >= (CC_2 + 1)))) begin
+            Result  = FC_SUCCESS_1_2;    
+        end        
+        else if ((CL_1 >= (CC_1 + 1))) begin
+            Result  = FC_SUCCESS_1;
+        end
+        else if ((CL_2 >= (CC_2 + 1))) begin
+            Result  = FC_SUCCESS_2;
+        end
+        return Result;
+    endfunction
 
 
-// 1st: Check Data
-// 2nd: Check Hdr
-function FC_result_t FC_Data_Hdr_Check_Update (  
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
-    input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
-    inout logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
-    input logic [9:0]                           PTLP_1,
-
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
-    input FC_command_t                          Command_1,
-    input FC_command_t                          Command_2
-);
-    FC_result_t Result;
-    Result  = FC_FAILED;
-    // check if command 1 and command 2 with same type (P, NP, Cpl)
-    if ((((Command_1 == FC_P_D) && (Command_2 == FC_P_H)) || ((Command_1 == FC_NP_D) && (Command_2 == FC_NP_H)) || ((Command_1 == FC_CPL_D) && (Command_2 == FC_CPL_H)))   
-                &&
-       ((CL_H_2 >= (CC_H_2 + 2)) && ((CL_H_1 >= (CC_H_1 + 2))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) 
-     ) begin
-        CC_H_1      = (CC_H_1 + 2);    
-        CC_H_2      = (CC_H_2 + 2);
-        CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        Result      = FC_SUCCESS_1_2;
-     end
-    else if (!(((Command_1 == FC_P_D) && (Command_2 == FC_P_H)) || ((Command_1 == FC_NP_D) && (Command_2 == FC_NP_H)) || ((Command_1 == FC_CPL_D) && (Command_2 == FC_CPL_H)))   
-                &&
-       ((CL_H_2 >= (CC_H_2 + 1)) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) 
-     ) begin
-        CC_H_1      = (CC_H_1 + 1);    
-        CC_H_2      = (CC_H_2 + 1);            
-        CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        Result      = FC_SUCCESS_1_2;
-    end
-    else if (((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
-            CC_H_1      = (CC_H_1 + 1);
-            CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-            if (((Command_1 == FC_P_D) && (Command_2 == FC_P_H)) || ((Command_1 == FC_NP_D) && (Command_2 == FC_NP_H)) || ((Command_1 == FC_CPL_D) && (Command_2 == FC_CPL_H))) begin
-                CC_H_2      = (CC_H_2 + 1);                
-            end
+    // 1st: Check Data
+    function FC_result_t FC_Data_Check (  
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
+        input logic [9:0]                           PTLP_1,
+        input logic [9:0]                           PTLP_2,
+        input logic                                 check_both
+    );
+        FC_result_t Result;
+        Result = FC_FAILED;
+        if ((CL_H_1 >= (CC_H_1 + 2)) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1) + FC_PTLP_Conv(PTLP_2)))) && check_both) begin
+            Result      = FC_SUCCESS_1_2;
+        end
+        else if ((CL_H_1 >= (CC_H_1 + 1)) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
             Result      = FC_SUCCESS_1;
-    end
-    else begin
-        if ((CL_H_2 >= (CC_H_2 + 1))) begin
-            CC_H_2      = (CC_H_2 + 1);
-            if (((Command_1 == FC_P_D) && (Command_2 == FC_P_H)) || ((Command_1 == FC_NP_D) && (Command_2 == FC_NP_H)) || ((Command_1 == FC_CPL_D) && (Command_2 == FC_CPL_H))) begin
-                CC_H_1      = (CC_H_1 + 1);                
-            end
+        end
+        return Result;
+    endfunction
+
+
+    // 1st: Check Data
+    // 2nd: Check Data
+    function FC_result_t FC_Data_Data_Check (  
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
+        input logic [9:0]                           PTLP_1,
+
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_2,
+        input logic [9:0]                           PTLP_2
+    );
+        FC_result_t Result;
+        Result   = FC_FAILED;
+        if ((CL_H_1 >= (CC_H_1 + 1)) && (CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1)))  && (CL_H_2 >= (CC_H_2 + 1)) && (CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2)))) begin
+            Result      = FC_SUCCESS_1_2;
+        end
+        else if ((CL_H_1 >= (CC_H_1 + 1)) && (CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1)))) begin
+            Result      = FC_SUCCESS_1;
+        end
+        else if ((CL_H_2 >= (CC_H_2 + 1)) && (CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2)))) begin
             Result      = FC_SUCCESS_2;
         end
-    end
-    return Result;
-endfunction
-
-// 1st: Check ERR
-function FC_result_t FC_ERR_Check_Update (  
-    // Cpl
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_1,
-    // Msg (posted)
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_1
-);
-    FC_result_t Result;
-    Result   = FC_FAILED;
-    if (((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1)))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-        Result          = FC_SUCCESS_1;
-    end
-    return Result;
-endfunction
+        return Result;
+    endfunction
 
 
-// 1st: Check ERR
-// 2nd: Check Hdr
-function FC_result_t FC_ERR_Hdr_Check_Update (  
-    // Cpl
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_1,
-    // Msg (posted)
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_1,
+    // 1st: Check Hdr
+    // 2nd: Check Data
+    function FC_result_t FC_Hdr_Data_Check (  
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
 
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
-    input FC_command_t                          Command_2
-);
-    FC_result_t Result;
-    Result = FC_FAILED;
-    if ((Command_2 == FC_P_H) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 2))) && (CL_H_2 >= (CC_H_2 + 2))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 2);
-        CC_H_2          = (CC_H_2 + 2);
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_2 == FC_CPL_H) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 2))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && (CL_H_2 >= (CC_H_2 + 2))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 2);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-        CC_H_2          = (CC_H_2 + 2);
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_2 != FC_CPL_H) && (Command_2 != FC_P_H) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && (CL_H_2 >= (CC_H_2 + 1))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-        CC_H_2          = (CC_H_2 + 1);
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if (((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1)))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-        if ((Command_2 == FC_P_H) || (Command_2 == FC_CPL_H)) begin
-            CC_H_2      = (CC_H_2 + 1);
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_2,
+        input logic [9:0]                           PTLP_2,
+        input FC_command_t                          Command_1,
+        input FC_command_t                          Command_2
+    );
+        FC_result_t Result;
+        Result  = FC_FAILED;
+        // check if command 1 and command 2 with same type (P, NP, Cpl)
+        if ((((Command_1 == FC_P_H) && (Command_2 == FC_P_D)) || ((Command_1 == FC_NP_H) && (Command_2 == FC_NP_D)) || ((Command_1 == FC_CPL_H) && (Command_2 == FC_CPL_D)))   
+                    &&
+        ((CL_H_1 >= (CC_H_1 + 2)) && ((CL_H_2 >= (CC_H_2 + 2))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) 
+        ) begin
+            Result      = FC_SUCCESS_1_2;
         end
-        Result          = FC_SUCCESS_1;
-    end
-    else begin
-        if ((CL_H_2 >= (CC_H_2 + 1))) begin
-            CC_H_2      = (CC_H_2 + 1);
-            if (Command_2 == FC_P_H) begin
-                CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-            end
-            else if (Command_2 == FC_CPL_H) begin
-                CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-            end
-            Result      = FC_SUCCESS_2;
+        else if (!(((Command_1 == FC_P_H) && (Command_2 == FC_P_D)) || ((Command_1 == FC_NP_H) && (Command_2 == FC_NP_D)) || ((Command_1 == FC_CPL_H) && (Command_2 == FC_CPL_D)))   
+                    &&
+        ((CL_H_1 >= (CC_H_1 + 1)) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) 
+        ) begin
+            Result      = FC_SUCCESS_1_2;
         end
-    end
-    return Result;
-endfunction
-
-// 1st: Check ERR
-// 2nd: Check Data
-function FC_result_t FC_ERR_Data_Check_Update (  
-    // Cpl
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_1,
-    // Msg (posted)
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_1,
-
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
-    input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
-    inout logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_2,
-    input logic [9:0]                           PTLP_2,
-    input FC_command_t                          Command_2
-);
-    FC_result_t Result;
-    Result = FC_FAILED;
-    if ((Command_2 == FC_P_D) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 2))) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 2);
-        CC_H_2          = (CC_H_2 + 2);
-        CC_D_2          = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_2 == FC_CPL_D) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 2))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 2);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-        CC_H_2          = (CC_H_2 + 2);
-        CC_D_2          = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_2 != FC_CPL_D) && (Command_2 != FC_P_D) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-        CC_H_2          = (CC_H_2 + 1);
-        CC_D_2          = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if (((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1)))) begin
-        CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-        CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-        if ((Command_2 == FC_P_D) || (Command_2 == FC_CPL_D)) begin
-            CC_H_2      = (CC_H_2 + 1);
-        end
-        Result          = FC_SUCCESS_1;
-    end
-    else begin
-    if (((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
-            CC_H_2      = (CC_H_2 + 1);
-            CC_D_2      = (CC_D_2 + FC_PTLP_Conv(PTLP_2));
-            if (Command_2 == FC_P_D) begin
-                CC_H_Msg_1      = (CC_H_Msg_1 + 1);
-            end
-            else if (Command_2 == FC_CPL_D) begin
-                CC_H_Cpl_1      = (CC_H_Cpl_1 + 1);
-            end
-            Result      = FC_SUCCESS_2;
-        end
-    end
-    return Result;
-endfunction
-
-// 1st: Check Hdr
-// 2nd: Check ERR
-function FC_result_t FC_Hdr_ERR_Check_Update (  
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
-
-    // Cpl
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_2,
-    // Msg (posted)
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_2,
-    input FC_command_t                          Command_1
-);
-    FC_result_t Result;
-    Result = FC_FAILED;
-    if ((Command_1 == FC_P_H) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 2))) && (CL_H_1 >= (CC_H_1 + 2))) begin
-        CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-        CC_H_Msg_2      = (CC_H_Msg_2 + 2);
-        CC_H_1          = (CC_H_1 + 2);
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_1 == FC_CPL_H) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 2))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && (CL_H_1 >= (CC_H_1 + 2))) begin
-        CC_H_Cpl_2      = (CC_H_Cpl_2 + 2);
-        CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-        CC_H_1          = (CC_H_1 + 2);
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_1 != FC_CPL_H) && (Command_1 != FC_P_H) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && (CL_H_1 >= (CC_H_1 + 1))) begin
-        CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-        CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-        CC_H_1          = (CC_H_1 + 1);
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((CL_H_1 >= (CC_H_1 + 1))) begin
-        CC_H_1      = (CC_H_1 + 1);
-        if (Command_1 == FC_P_H) begin
-            CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-        end
-        else if (Command_1 == FC_CPL_H) begin
-            CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-        end
-        Result      = FC_SUCCESS_1;
-    end
-    else begin
-        if (((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1)))) begin
-            CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-            CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-            if ((Command_1 == FC_P_H) || (Command_1 == FC_CPL_H)) begin
-                CC_H_1      = (CC_H_1 + 1);
-            end
-            Result          = FC_SUCCESS_2;
-        end
-    end
-    return Result;
-endfunction
-
-// 1st: Check Data
-// 2nd: Check ERR
-function FC_result_t FC_Data_ERR_Check_Update (  
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
-    input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
-    inout logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
-    input logic [9:0]                           PTLP_1,
-
-    // Cpl
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_2,
-    // Msg (posted)
-    input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_2,
-    inout logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_2,
-    input FC_command_t                          Command_1
-);
-    FC_result_t Result;
-    Result  = FC_FAILED;
-    if ((Command_1 == FC_P_D) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 2))) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
-        CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-        CC_H_Msg_2      = (CC_H_Msg_2 + 2);
-        CC_H_1          = (CC_H_1 + 2);
-        CC_D_1          = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_1 == FC_CPL_D) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 2))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
-        CC_H_Cpl_2      = (CC_H_Cpl_2 + 2);
-        CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-        CC_H_1          = (CC_H_1 + 2);
-        CC_D_1          = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if ((Command_1 != FC_CPL_D) && (Command_1 != FC_P_D) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
-        CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-        CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-        CC_H_1          = (CC_H_1 + 1);
-        CC_D_1          = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        Result          = FC_SUCCESS_1_2;
-    end
-    else if (((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
-        CC_H_1      = (CC_H_1 + 1);
-        CC_D_1      = (CC_D_1 + FC_PTLP_Conv(PTLP_1));
-        if (Command_1 == FC_P_D) begin
-            CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-        end
-        else if (Command_1 == FC_CPL_D) begin
-            CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-        end
-        Result      = FC_SUCCESS_1;
-    end
-    else if ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) begin
-        if ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) begin
-            CC_H_Cpl_2      = (CC_H_Cpl_2 + 1);
-            CC_H_Msg_2      = (CC_H_Msg_2 + 1);
-            if ((Command_1 == FC_P_D) || (Command_1 == FC_CPL_D)) begin
-                CC_H_1      = (CC_H_1 + 1);
-            end
-            Result          = FC_SUCCESS_2;
+        else if ((CL_H_1 >= (CC_H_1 + 1))) begin
+            Result      = FC_SUCCESS_1;
         end
         else begin
-            Result      = FC_FAILED;                                    
+            if (((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
+                Result      = FC_SUCCESS_2;
+            end
         end
-    end
-    return Result;
-endfunction
+        return Result;
+    endfunction
 
+
+    // 1st: Check Data
+    // 2nd: Check Hdr
+    function FC_result_t FC_Data_Hdr_Check (  
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
+        input logic [9:0]                           PTLP_1,
+
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
+        input FC_command_t                          Command_1,
+        input FC_command_t                          Command_2
+    );
+        FC_result_t Result;
+        Result  = FC_FAILED;
+        // check if command 1 and command 2 with same type (P, NP, Cpl)
+        if ((((Command_1 == FC_P_D) && (Command_2 == FC_P_H)) || ((Command_1 == FC_NP_D) && (Command_2 == FC_NP_H)) || ((Command_1 == FC_CPL_D) && (Command_2 == FC_CPL_H)))   
+                    &&
+        ((CL_H_2 >= (CC_H_2 + 2)) && ((CL_H_1 >= (CC_H_1 + 2))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) 
+        ) begin
+            Result      = FC_SUCCESS_1_2;
+        end
+        else if (!(((Command_1 == FC_P_D) && (Command_2 == FC_P_H)) || ((Command_1 == FC_NP_D) && (Command_2 == FC_NP_H)) || ((Command_1 == FC_CPL_D) && (Command_2 == FC_CPL_H)))   
+                    &&
+        ((CL_H_2 >= (CC_H_2 + 1)) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) 
+        ) begin
+            Result      = FC_SUCCESS_1_2;
+        end
+        else if (((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
+                Result      = FC_SUCCESS_1;
+        end
+        else begin
+            if ((CL_H_2 >= (CC_H_2 + 1))) begin
+                Result      = FC_SUCCESS_2;
+            end
+        end
+        return Result;
+    endfunction
+
+    // 1st: Check ERR
+    function FC_result_t FC_ERR_Check (  
+        // Cpl
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_1,
+        // Msg (posted)
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_1
+    );
+        FC_result_t Result;
+        Result   = FC_FAILED;
+        if (((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1)))) begin
+            Result          = FC_SUCCESS_1;
+        end
+        return Result;
+    endfunction
+
+
+    // 1st: Check ERR
+    // 2nd: Check Hdr
+    function FC_result_t FC_ERR_Hdr_Check (  
+        // Cpl
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_1,
+        // Msg (posted)
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_1,
+
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
+        input FC_command_t                          Command_2
+    );
+        FC_result_t Result;
+        Result = FC_FAILED;
+        if ((Command_2 == FC_P_H) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 2))) && (CL_H_2 >= (CC_H_2 + 2))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_2 == FC_CPL_H) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 2))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && (CL_H_2 >= (CC_H_2 + 2))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_2 != FC_CPL_H) && (Command_2 != FC_P_H) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && (CL_H_2 >= (CC_H_2 + 1))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if (((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1)))) begin
+            Result          = FC_SUCCESS_1;
+        end
+        else begin
+            if ((CL_H_2 >= (CC_H_2 + 1))) begin
+                Result      = FC_SUCCESS_2;
+            end
+        end
+        return Result;
+    endfunction
+
+    // 1st: Check ERR
+    // 2nd: Check Data
+    function FC_result_t FC_ERR_Data_Check (  
+        // Cpl
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_1,
+        // Msg (posted)
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_1,
+
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_2,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_2,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_2,
+        input logic [9:0]                           PTLP_2,
+        input FC_command_t                          Command_2
+    );
+        FC_result_t Result;
+        Result = FC_FAILED;
+        if ((Command_2 == FC_P_D) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 2))) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_2 == FC_CPL_D) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 2))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_2 != FC_CPL_D) && (Command_2 != FC_P_D) && ((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1))) && ((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if (((CL_H_Cpl_1 >= (CC_H_Cpl_1 + 1))) && ((CL_H_Msg_1 >= (CC_H_Msg_1 + 1)))) begin
+            Result          = FC_SUCCESS_1;
+        end
+        else begin
+            if (((CL_H_2 >= (CC_H_2 + 1))) && ((CL_D_2 >= (CC_D_2 + FC_PTLP_Conv(PTLP_2))))) begin
+                    Result      = FC_SUCCESS_2;
+                end
+            end
+        return Result;
+    endfunction
+
+    // 1st: Check Hdr
+    // 2nd: Check ERR
+    function FC_result_t FC_Hdr_ERR_Check (  
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
+
+        // Cpl
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_2,
+        // Msg (posted)
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_2,
+        input FC_command_t                          Command_1
+    );
+        FC_result_t Result;
+        Result = FC_FAILED;
+        if ((Command_1 == FC_P_H) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 2))) && (CL_H_1 >= (CC_H_1 + 2))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_1 == FC_CPL_H) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 2))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && (CL_H_1 >= (CC_H_1 + 2))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_1 != FC_CPL_H) && (Command_1 != FC_P_H) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && (CL_H_1 >= (CC_H_1 + 1))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((CL_H_1 >= (CC_H_1 + 1))) begin
+            Result      = FC_SUCCESS_1;
+        end
+        else begin
+            if (((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1)))) begin
+                Result          = FC_SUCCESS_2;
+            end
+        end
+        return Result;
+    endfunction
+
+    // 1st: Check Data
+    // 2nd: Check ERR
+    function FC_result_t FC_Data_ERR_Check (  
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CL_D_1,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_1,
+        input logic [FC_DATA_WIDTH  - 1 : 0]        CC_D_1,
+        input logic [9:0]                           PTLP_1,
+
+        // Cpl
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Cpl_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Cpl_2,
+        // Msg (posted)
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CL_H_Msg_2,
+        input logic [FC_HDR_WIDTH   - 1 : 0]        CC_H_Msg_2,
+        input FC_command_t                          Command_1
+    );
+        FC_result_t Result;
+        Result  = FC_FAILED;
+        if ((Command_1 == FC_P_D) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 2))) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_1 == FC_CPL_D) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 2))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if ((Command_1 != FC_CPL_D) && (Command_1 != FC_P_D) && ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) && ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) && ((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
+            Result          = FC_SUCCESS_1_2;
+        end
+        else if (((CL_H_1 >= (CC_H_1 + 1))) && ((CL_D_1 >= (CC_D_1 + FC_PTLP_Conv(PTLP_1))))) begin
+            Result      = FC_SUCCESS_1;
+        end
+        else if ((CL_H_Cpl_2 >= (CC_H_Cpl_2 + 1))) begin
+            if ((CL_H_Msg_2 >= (CC_H_Msg_2 + 1))) begin
+                Result          = FC_SUCCESS_2;
+            end
+            else begin
+                Result      = FC_FAILED;                                    
+            end
+        end
+        return Result;
+    endfunction
+///////////////////////////////////////////////////
 
 function logic [9 : 0] FC_PTLP_Conv (input logic [9 : 0] PTLP);
     // if PTLP % 4 == 0 (devisable by 4) then result = (PTLP / 4)
@@ -573,9 +435,8 @@ always_ff @(posedge clk or negedge arst) begin : FC_DLL_Update
     end
 end
 
-always_ff @(posedge clk or negedge arst) begin : FC_Arbiter_Command
+always_ff @(posedge clk or negedge arst) begin : CC_Update
     if (!arst) begin
-        _fc_arbiter.Result <= FC_INVALID;
         CC_Posted_Hdr       <= '0;
         CC_Posted_Data      <= '0;
         CC_NonPosted_Hdr    <= '0;
@@ -585,207 +446,976 @@ always_ff @(posedge clk or negedge arst) begin : FC_Arbiter_Command
     end    
     else begin
         case (_fc_arbiter.Command_1)
+            // done
             FC_P_H   : begin
                 case (_fc_arbiter.Command_2)
                     FC_P_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, 1'b1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr <= CC_Posted_Hdr + 2;                                
+                           end
+                           FC_SUCCESS_1, FC_SUCCESS_2: begin
+                                CC_Posted_Hdr <= CC_Posted_Hdr + 1;                                                            
+                           end
+                        endcase
                     end 
                     FC_P_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 2;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                               
+                           end
+                        endcase
                     end 
                     FC_NP_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Hdr_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, CL_NonPosted_Hdr, CC_NonPosted_Hdr);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_NP_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_CPL_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Hdr_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_CPL_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_ERR: begin
-                        _fc_arbiter.Result <= FC_Hdr_ERR_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 , FC_SUCCESS_1 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end
                     default: begin
-                        _fc_arbiter.Result <= FC_Hdr_Check_Update(CL_Posted_Hdr, CC_Posted_Hdr, 1'b0);
+                        CC_Posted_Hdr    <= (_fc_arbiter.Result != FC_FAILED)  ?  CC_Posted_Hdr + 1 : CC_Posted_Hdr;
                     end
                 endcase
             end
+            // done
             FC_P_D   : begin
                 case (_fc_arbiter.Command_2)
                     FC_P_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 2;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_P_D : begin
-                        _fc_arbiter.Result <= FC_Data_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, _fc_arbiter.PTLP_2, 1'b1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 2;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1) + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_NP_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_NP_D : begin
-                        _fc_arbiter.Result <= FC_Data_Data_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_CPL_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data  <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_CPL_D : begin
-                        _fc_arbiter.Result <= FC_Data_Data_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_ERR: begin
-                        _fc_arbiter.Result <= FC_Data_ERR_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;      
+                           end
+                        endcase
                     end
                     default: begin
-                        _fc_arbiter.Result <= FC_Data_Check_Update(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, '0, 1'b0);
+                        CC_Posted_Hdr    <= (_fc_arbiter.Result != FC_FAILED)  ?  CC_Posted_Hdr + 1 : CC_Posted_Hdr;
+                        CC_Posted_Data    <= (_fc_arbiter.Result != FC_FAILED)  ?  (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1)) :CC_Posted_Data;
+
                     end
                 endcase
             end
+            // done
             FC_NP_H   : begin
                 case (_fc_arbiter.Command_2)
                     FC_P_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Hdr_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_P_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_NP_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, 1'b1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr <= CC_NonPosted_Hdr + 2;                                
+                           end
+                           FC_SUCCESS_1, FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr <= CC_NonPosted_Hdr + 1;                                                            
+                           end
+                        endcase
                     end 
                     FC_NP_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 2;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_CPL_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Hdr_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_CPL_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_ERR: begin
-                        _fc_arbiter.Result <= FC_Hdr_ERR_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end
                     default: begin
-                        _fc_arbiter.Result <= FC_Hdr_Check_Update(CL_NonPosted_Hdr, CC_NonPosted_Hdr, 1'b0);
+                        CC_NonPosted_Hdr    <= (_fc_arbiter.Result != FC_FAILED)  ?  CC_NonPosted_Hdr + 1 : CC_NonPosted_Hdr;
                     end
                 endcase
             end
+            // done
             FC_NP_D   : begin
                 case (_fc_arbiter.Command_2)
                     FC_P_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;                         
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr   <= CC_Posted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_P_D : begin
-                        _fc_arbiter.Result <= FC_Data_Data_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_NP_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 2;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_NP_D : begin
-                        _fc_arbiter.Result <= FC_Data_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, _fc_arbiter.PTLP_2, 1'b1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 2;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1) + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr   <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data  <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr   <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data  <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_CPL_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr        <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data       <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr        <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data       <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_CPL_D : begin
-                        _fc_arbiter.Result <= FC_Data_Data_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_NonPosted_Hdr        <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data       <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr        <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data       <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_ERR: begin
-                        _fc_arbiter.Result <= FC_Data_ERR_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1, FC_SUCCESS_1_2: begin
+                                CC_NonPosted_Hdr       <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data      <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;      
+                           end
+                        endcase
                     end
                     default: begin
-                        _fc_arbiter.Result <= FC_Data_Check_Update(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, '0, 1'b0);
+                        CC_NonPosted_Hdr    <= (_fc_arbiter.Result != FC_FAILED)  ?  CC_NonPosted_Hdr + 1 : CC_NonPosted_Hdr;
+                        CC_NonPosted_Data    <= (_fc_arbiter.Result != FC_FAILED)  ?  (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1)) : CC_NonPosted_Data;
+
                     end
                 endcase
             end
+            // done
             FC_CPL_H   : begin
                 case (_fc_arbiter.Command_2)
                     FC_P_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Hdr_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_P_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_NP_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Hdr_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_NonPosted_Hdr, CC_NonPosted_Hdr);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_NP_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data   <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_CPL_H : begin
-                        _fc_arbiter.Result <= FC_Hdr_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, 1'b1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr <= CC_Completion_Hdr + 2;                                
+                           end
+                           FC_SUCCESS_1, FC_SUCCESS_2: begin
+                                CC_Completion_Hdr <= CC_Completion_Hdr + 1;                                
+                           end
+                        endcase
                     end 
                     FC_CPL_D : begin
-                        _fc_arbiter.Result <= FC_Hdr_Data_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 2;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_NonPosted_Hdr    <= CC_NonPosted_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_ERR: begin
-                        _fc_arbiter.Result <= FC_Hdr_ERR_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1, FC_SUCCESS_1_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end
                     default: begin
-                        _fc_arbiter.Result <= FC_Hdr_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, 1'b0);
+                        CC_Completion_Hdr    <= (_fc_arbiter.Result != FC_FAILED)  ?  CC_Completion_Hdr + 1 : CC_Completion_Hdr;
                     end
                 endcase
             end
             FC_CPL_D   : begin
                 case (_fc_arbiter.Command_2)
                     FC_P_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_P_D : begin
-                        _fc_arbiter.Result <= FC_Data_Data_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_NP_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                                CC_NonPosted_Hdr        <= CC_NonPosted_Hdr + 1;                         
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr        <= CC_NonPosted_Hdr + 1;                         
+                           end
+                        endcase
                     end 
                     FC_NP_D : begin
-                        _fc_arbiter.Result <= FC_Data_Data_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                                CC_NonPosted_Hdr     <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data    <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));       
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr     <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data    <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_CPL_H : begin
-                        _fc_arbiter.Result <= FC_Data_Hdr_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 2;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_CPL_D : begin
-                        _fc_arbiter.Result <= FC_Data_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, _fc_arbiter.PTLP_2, 1'b1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1_2 : begin
+                                CC_Completion_Hdr    <= CC_Completion_Hdr + 2;
+                                CC_Completion_Data   <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1) + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                           FC_SUCCESS_1: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr   <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data  <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_ERR: begin
-                        _fc_arbiter.Result <= FC_Data_ERR_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1));                                
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;      
+                           end
+                        endcase
                     end
                     default: begin
-                        _fc_arbiter.Result <= FC_Data_Check_Update(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, '0, 1'b0);
+                        CC_Completion_Hdr    <= (_fc_arbiter.Result != FC_FAILED)  ?  CC_Completion_Hdr + 1 : CC_Completion_Hdr;
+                        CC_Completion_Data    <= (_fc_arbiter.Result != FC_FAILED)  ?  (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_1)) : CC_Completion_Data;
                     end
                 endcase
             end
             FC_ERR   : begin
                 case (_fc_arbiter.Command_2)
                     FC_P_H : begin
-                        _fc_arbiter.Result <= FC_ERR_Hdr_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_P_D : begin
-                        _fc_arbiter.Result <= FC_ERR_Data_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr       <= CC_Posted_Hdr + 1;
+                                CC_Posted_Data      <= (CC_Posted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));                                
+                           end
+                        endcase
                     end 
                     FC_NP_H : begin
-                        _fc_arbiter.Result <= FC_ERR_Hdr_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr         <= CC_NonPosted_Hdr + 1;                         
+                           end
+                        endcase
                     end 
                     FC_NP_D : begin
-                        _fc_arbiter.Result <= FC_ERR_Data_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_NonPosted_Hdr        <= CC_NonPosted_Hdr + 1;
+                                CC_NonPosted_Data       <= (CC_NonPosted_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));       
+                           end
+                        endcase
                     end 
                     FC_CPL_H : begin
-                        _fc_arbiter.Result <= FC_ERR_Hdr_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
                     end 
                     FC_CPL_D : begin
-                        _fc_arbiter.Result <= FC_ERR_Data_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_2);
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                                CC_Completion_Data      <= (CC_Completion_Data + FC_PTLP_Conv(_fc_arbiter.PTLP_2));       
+                           end
+                        endcase
                     end 
-                    FC_ERR : begin
-                        _fc_arbiter.Result <= FC_ERR_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);                        
-                    end 
+                    FC_ERR: begin
+                        case (_fc_arbiter.Result)
+                           FC_SUCCESS_1 , FC_SUCCESS_1_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                           FC_SUCCESS_2: begin
+                                CC_Posted_Hdr           <= CC_Posted_Hdr + 1;                         
+                                CC_Completion_Hdr       <= CC_Completion_Hdr + 1;
+                           end
+                        endcase
+                    end
                     default: begin
-                        _fc_arbiter.Result <= FC_ERR_Check_Update(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);
+                        CC_Posted_Hdr           <= (_fc_arbiter.Result != FC_FAILED)  ? CC_Posted_Hdr + 1 : CC_Posted_Hdr;                         
+                        CC_Completion_Hdr       <= (_fc_arbiter.Result != FC_FAILED)  ? CC_Completion_Hdr + 1: CC_Completion_Hdr;
                     end
                 endcase
             end
             default: begin
-                _fc_arbiter.Result <= FC_INVALID;
             end
         endcase
     end
+end
+
+always_comb begin : Result_Calc
+    case (_fc_arbiter.Command_1)
+        FC_P_H   : begin
+            case (_fc_arbiter.Command_2)
+                FC_P_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Check(CL_Posted_Hdr, CC_Posted_Hdr, 1'b1);
+                end 
+                FC_P_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_NP_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Hdr_Check(CL_Posted_Hdr, CC_Posted_Hdr, CL_NonPosted_Hdr, CC_NonPosted_Hdr);
+                end 
+                FC_NP_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_Posted_Hdr, CC_Posted_Hdr, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Hdr_Check(CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr);
+                end 
+                FC_CPL_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_ERR: begin
+                    _fc_arbiter.Result = FC_Hdr_ERR_Check(CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                end
+                default: begin
+                    _fc_arbiter.Result = FC_Hdr_Check(CL_Posted_Hdr, CC_Posted_Hdr, 1'b0);
+                end
+            endcase
+        end
+        FC_P_D   : begin
+            case (_fc_arbiter.Command_2)
+                FC_P_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_P_D : begin
+                    _fc_arbiter.Result = FC_Data_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, _fc_arbiter.PTLP_2, 1'b1);
+                end 
+                FC_NP_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_NP_D : begin
+                    _fc_arbiter.Result = FC_Data_Data_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2);
+                end 
+                FC_CPL_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_D : begin
+                    _fc_arbiter.Result = FC_Data_Data_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2);
+                end 
+                FC_ERR: begin
+                    _fc_arbiter.Result = FC_Data_ERR_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                end
+                default: begin
+                    _fc_arbiter.Result = FC_Data_Check(CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_1, '0, 1'b0);
+                end
+            endcase
+        end
+        FC_NP_H   : begin
+            case (_fc_arbiter.Command_2)
+                FC_P_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Hdr_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);
+                end 
+                FC_P_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_NP_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, 1'b1);
+                end 
+                FC_NP_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Hdr_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr);
+                end 
+                FC_CPL_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_ERR: begin
+                    _fc_arbiter.Result = FC_Hdr_ERR_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                end
+                default: begin
+                    _fc_arbiter.Result = FC_Hdr_Check(CL_NonPosted_Hdr, CC_NonPosted_Hdr, 1'b0);
+                end
+            endcase
+        end
+        FC_NP_D   : begin
+            case (_fc_arbiter.Command_2)
+                FC_P_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_P_D : begin
+                    _fc_arbiter.Result = FC_Data_Data_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2);
+                end 
+                FC_NP_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_NP_D : begin
+                    _fc_arbiter.Result = FC_Data_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, _fc_arbiter.PTLP_2, 1'b1);
+                end 
+                FC_CPL_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_D : begin
+                    _fc_arbiter.Result = FC_Data_Data_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2);
+                end 
+                FC_ERR: begin
+                    _fc_arbiter.Result = FC_Data_ERR_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                end
+                default: begin
+                    _fc_arbiter.Result = FC_Data_Check(CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_1, '0, 1'b0);
+                end
+            endcase
+        end
+        FC_CPL_H   : begin
+            case (_fc_arbiter.Command_2)
+                FC_P_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Hdr_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);
+                end 
+                FC_P_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_NP_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Hdr_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_NonPosted_Hdr, CC_NonPosted_Hdr);
+                end 
+                FC_NP_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_H : begin
+                    _fc_arbiter.Result = FC_Hdr_Check(CL_Completion_Hdr, CC_Completion_Hdr, 1'b1);
+                end 
+                FC_CPL_D : begin
+                    _fc_arbiter.Result = FC_Hdr_Data_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_ERR: begin
+                    _fc_arbiter.Result = FC_Hdr_ERR_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                end
+                default: begin
+                    _fc_arbiter.Result = FC_Hdr_Check(CL_Completion_Hdr, CC_Completion_Hdr, 1'b0);
+                end
+            endcase
+        end
+        FC_CPL_D   : begin
+            case (_fc_arbiter.Command_2)
+                FC_P_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_P_D : begin
+                    _fc_arbiter.Result = FC_Data_Data_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2);
+                end 
+                FC_NP_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_NP_D : begin
+                    _fc_arbiter.Result = FC_Data_Data_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_NonPosted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2);
+                end 
+                FC_CPL_H : begin
+                    _fc_arbiter.Result = FC_Data_Hdr_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_1, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_D : begin
+                    _fc_arbiter.Result = FC_Data_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, _fc_arbiter.PTLP_2, 1'b1);
+                end 
+                FC_ERR: begin
+                    _fc_arbiter.Result = FC_Data_ERR_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_1);
+                end
+                default: begin
+                    _fc_arbiter.Result = FC_Data_Check(CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_1, '0, 1'b0);
+                end
+            endcase
+        end
+        FC_ERR   : begin
+            case (_fc_arbiter.Command_2)
+                FC_P_H : begin
+                    _fc_arbiter.Result = FC_ERR_Hdr_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, _fc_arbiter.Command_2);
+                end 
+                FC_P_D : begin
+                    _fc_arbiter.Result = FC_ERR_Data_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CL_Posted_Data, CC_Posted_Hdr, CC_Posted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_2);
+                end 
+                FC_NP_H : begin
+                    _fc_arbiter.Result = FC_ERR_Hdr_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_NonPosted_Hdr, CC_NonPosted_Hdr, _fc_arbiter.Command_2);
+                end 
+                FC_NP_D : begin
+                    _fc_arbiter.Result = FC_ERR_Data_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Posted_Hdr, CL_NonPosted_Data, CC_NonPosted_Hdr, CC_NonPosted_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_H : begin
+                    _fc_arbiter.Result = FC_ERR_Hdr_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CC_Completion_Hdr, _fc_arbiter.Command_2);
+                end 
+                FC_CPL_D : begin
+                    _fc_arbiter.Result = FC_ERR_Data_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr, CL_Completion_Hdr, CL_Completion_Data, CC_Completion_Hdr, CC_Completion_Data, _fc_arbiter.PTLP_2, _fc_arbiter.Command_2);
+                end 
+                FC_ERR : begin
+                    _fc_arbiter.Result = FC_ERR_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);                        
+                end 
+                default: begin
+                    _fc_arbiter.Result = FC_ERR_Check(CL_Completion_Hdr, CC_Completion_Hdr, CL_Posted_Hdr, CC_Posted_Hdr);
+                end
+            endcase
+        end
+        default: begin
+            _fc_arbiter.Result = FC_INVALID;
+        end
+    endcase
 end
 
 /* Instantiations */

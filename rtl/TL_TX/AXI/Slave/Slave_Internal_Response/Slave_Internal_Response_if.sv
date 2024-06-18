@@ -46,5 +46,6 @@ interface Slave_Internal_Response_if;
                     RVALID
 
     );
+    
 
 endinterface: Slave_Internal_Response_if

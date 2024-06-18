@@ -16,9 +16,10 @@ module Slave_Top (
 
         /************************** Request Path Ports **************************/
         // Interface with 2 FSMS of Push
-        axi_if  slave_push_if,
+        axi_if                                  slave_push_if,
         // input from Configuration space 
         input logic [REQUESTER_ID_WIDTH - 1 : 0] Requester_ID, 
+        input logic                                 config_ecrc,    // this bit from configuration indicate ecrc generation is enabled
         // input from Tx Arbiter
         input logic             axi_req_wr_grant,
         input logic             axi_req_rd_grant,
@@ -32,8 +33,8 @@ module Slave_Top (
         output logic [AXI_MAX_NUM_BYTES * 8 - 1 : 0] axi_req_data,
 
         /************************** Response Path Ports **************************/
-        Master_Interface            Master_if,
-        P2A_Rx_Router_Interface     Rx_Router_if     
+        Master_Interface.SLAVE            Master_if,
+        P2A_Rx_Router_Interface.P2A_RX_ROUTER     Rx_Router_if     
 );
     /********* Internal Signals *********/
         logic wr_atop_en, rd_atop_en;    
@@ -107,10 +108,10 @@ module Slave_Top (
                        // Global Signals
                     axi_clk,
                     ARESTn ,
-                    recorder_if, // drive from push wr fsm request side
-                    recorder_if, // drive from push rd fsm request side
-                    recorder_if, // drive from mux from request side
-                    recorder_if // drive from mapper response side
+                    recorder_if.request_recorder_rdreqport_wr, // drive from push wr fsm request side
+                    recorder_if.request_recorder_rdreqport_rd, // drive from push rd fsm request side
+                    recorder_if.wrreqport_request_recorder, // drive from mux from request side
+                    recorder_if.REQUEST_RECORDER_P2A // drive from mapper response side
             );
 
             Sync_FIFO #(
@@ -119,8 +120,8 @@ module Slave_Top (
             ) u_AW_FIFO (
                 axi_clk, 
                 ARESTn,
-                AWFIFO_if,
-                AWFIFO_if
+                AWFIFO_if.FIFO_SOURCE,
+                AWFIFO_if.FIFO_DIST
             );
 
             Sync_FIFO #(
@@ -129,8 +130,8 @@ module Slave_Top (
             ) u_W_FIFO (
                 axi_clk, 
                 ARESTn,
-                WFIFO_if,
-                WFIFO_if
+                WFIFO_if.FIFO_SOURCE,
+                WFIFO_if.FIFO_DIST
             );
 
             Sync_FIFO #(
@@ -139,8 +140,8 @@ module Slave_Top (
             ) u_AR_FIFO (
                 axi_clk, 
                 ARESTn,
-                ARFIFO_if,
-                ARFIFO_if
+                ARFIFO_if.FIFO_SOURCE,
+                ARFIFO_if.FIFO_DIST
             );
 
             Sync_FIFO #(
@@ -149,8 +150,8 @@ module Slave_Top (
             ) u_B_FIFO (
                 axi_clk,
                 ARESTn,
-                BFIFO_if,
-                BFIFO_if    
+                BFIFO_if.FIFO_SOURCE,
+                BFIFO_if.FIFO_DIST    
             );
 
             Sync_FIFO #(
@@ -159,8 +160,8 @@ module Slave_Top (
             ) u_R_FIFO (
                 axi_clk,
                 ARESTn,
-                RFIFO_if,
-                RFIFO_if    
+                RFIFO_if.FIFO_SOURCE,
+                RFIFO_if.FIFO_DIST    
             );
 
             Response_Push_FSM  #(
@@ -168,18 +169,18 @@ module Slave_Top (
             ) u_Rsp_Push_FSM (
                 axi_clk,
                 ARESTn,
-                BFIFO_if,
-                RFIFO_if,
-                P2A_Push_FMS_if
+                BFIFO_if.SOURCE_FIFO,
+                RFIFO_if.SOURCE_FIFO,
+                P2A_Push_FMS_if.FSM_P2A
             );
 
             P2A #(
             ) u_P2A (
                 axi_clk, 
                 ARESTn,
-                P2A_Push_FMS_if,
+                P2A_Push_FMS_if.P2A_FSM,
                 Rx_Router_if,
-                recorder_if
+                recorder_if.P2A_REQUEST_RECORDER
             );
 
             // Request_Recorder #(
@@ -199,11 +200,11 @@ module Slave_Top (
             ) u_Rsp_Pop_FSM (
                 axi_clk,
                 ARESTn,
-                BFIFO_if,
-                RFIFO_if,
+                BFIFO_if.DIST_FIFO,
+                RFIFO_if.DIST_FIFO,
                 Master_if,
-                RESP_if,
-                RESP_if
+                RESP_if.B_TO_AW,
+                RESP_if.R_TO_AR
             );
 
 
@@ -211,21 +212,21 @@ module Slave_Top (
         axi_push_fsm_wr u_axi_push_fsm_wr (
                 axi_clk, 
                 ARESTn, 
-                slave_push_if, 
-                AWFIFO_if,
-                recorder_if,
-                err_wr_if,
-                WFIFO_if
+                slave_push_if.axi_slave_request_push_fsm_wr, 
+                AWFIFO_if.SOURCE_FIFO,
+                recorder_if.rdreqport_wr_request_recorder,
+                err_wr_if.AW_TO_B,
+                WFIFO_if.SOURCE_FIFO
             );
 
         // Instantiate PUSH FSM for Read 
         axi_slave_fsm_rd u_axi_slave_fsm_rd (
                 axi_clk, 
                 ARESTn, 
-                slave_push_if, 
-                recorder_if,
-                err_rd_if,
-                ARFIFO_if
+                slave_push_if.axi_slave_request_push_fsm_rd, 
+                recorder_if.rdreqport_rd_request_recorder,
+                err_rd_if.AR_TO_R,
+                ARFIFO_if.SOURCE_FIFO
             );
         
         // Instantiate mapper and pop fsm for write requests 
@@ -233,8 +234,9 @@ module Slave_Top (
                 wr_atop_en,
                 AWFIFO_if.FIFO_rd_data,
                 Requester_ID,
+                config_ecrc,
                 axi_wrreq_hdr,
-                wr_recorder_if,
+                wr_recorder_if.request_recorder_wrreqport,
                 axi_wrreq_hdr_valid,
                 axi_req_wr_grant
             );
@@ -242,10 +244,10 @@ module Slave_Top (
             fifo_pop_wr u_fifo_pop_wr (
                 axi_clk,
                 ARESTn,
-                AWFIFO_if,
-                WFIFO_if, 
+                AWFIFO_if.DIST_FIFO,
+                WFIFO_if.DIST_FIFO, 
                 wr_atop_en,
-                posted_wr_if,
+                posted_wr_if.AW_TO_B,
                 axi_req_wr_grant,
                 axi_req_data
             ); 
@@ -253,9 +255,9 @@ module Slave_Top (
             fifo_pop_rd u_fifo_pop_rd (
                 axi_clk,
                 ARESTn,
-                ARFIFO_if,
+                ARFIFO_if.DIST_FIFO,
                 rd_atop_en,
-                posted_rd_if,
+                posted_rd_if.AR_TO_R,
                 axi_req_rd_grant
             );
     
@@ -263,8 +265,9 @@ module Slave_Top (
                 rd_atop_en,
                 ARFIFO_if.FIFO_rd_data,
                 Requester_ID,
+                config_ecrc,
                 axi_rdreq_hdr,
-                rd_recorder_if,
+                rd_recorder_if.request_recorder_wrreqport,
                 axi_rdreq_hdr_valid,
                 axi_req_rd_grant
             );
@@ -272,25 +275,25 @@ module Slave_Top (
             // Instantiate Mux for write interface for recorder
  
             wr_interface_mux u_wr_interface_mux (
-            wr_recorder_if,
-            rd_recorder_if,
+            wr_recorder_if.wrreqport_request_recorder,
+            rd_recorder_if.wrreqport_request_recorder,
             axi_req_wr_grant,
             axi_req_rd_grant,
-            recorder_if
+            recorder_if.request_recorder_wrreqport
             );
 
 
             slave_internal_response_rd_mux u_slave_internal_response_rd_mux (
-                err_rd_if,
-                posted_rd_if,
-                RESP_if
+                err_rd_if.R_TO_AR, 
+                posted_rd_if.R_TO_AR,
+                RESP_if.AR_TO_R
 
             );
 
             slave_internal_response_wr_mux u_slave_internal_response_wr_mux (
-            err_wr_if,
-            posted_wr_if,
-            RESP_if
+            err_wr_if.B_TO_AW,
+            posted_wr_if.B_TO_AW,
+            RESP_if.AW_TO_B
             );
   
 

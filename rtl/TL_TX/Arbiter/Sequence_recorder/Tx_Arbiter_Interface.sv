@@ -98,27 +98,56 @@ endinterface: Tx_Arbiter_Rx_Router
 /***************************************************************/
 interface Tx_Arbiter_Sequence_Recorder #(
     parameter   DATA_WIDTH      = 8,
-                FIFO_DEPTH      = 4,
+                FIFO_DEPTH      = 8,
                 ADDR_WIDTH      = $clog2(FIFO_DEPTH) 
 ); 
     /* Packages */
     import Tx_Arbiter_Package::*;
+    logic                   wr_en_tx_arbiter;
+    logic [2:0]             wr_mode_tx_arbiter;
+    Tx_Arbiter_Sources_t    wr_data_1_tx_arbiter;
+    Tx_Arbiter_Sources_t    wr_data_2_tx_arbiter;
+    Tx_Arbiter_Sources_t    wr_data_3_tx_arbiter;
+    Tx_Arbiter_Sources_t    wr_data_4_tx_arbiter;
 
-    // Interface with A2P_1
-    logic                   full;
-    logic                   empty;
-    logic [ADDR_WIDTH  : 0] available;
+    modport TX_ARBITER_SEQUENCE_RECORDER (
+        output  wr_en_tx_arbiter,
+                wr_mode_tx_arbiter,
+                wr_data_1_tx_arbiter,
+                wr_data_2_tx_arbiter,
+                wr_data_3_tx_arbiter,
+                wr_data_4_tx_arbiter
+    );
+
+    modport SEQUENCE_RECORDER_TX_ARBITER (
+        input   wr_en_tx_arbiter,
+                wr_mode_tx_arbiter,
+                wr_data_1_tx_arbiter,
+                wr_data_2_tx_arbiter,
+                wr_data_3_tx_arbiter,
+                wr_data_4_tx_arbiter
+    );
+    
+endinterface: Tx_Arbiter_Sequence_Recorder
+
+interface Arbiter_FSM_Sequence_Recorder #(
+    parameter   DATA_WIDTH      = 8,
+                FIFO_DEPTH      = 8,
+                ADDR_WIDTH      = $clog2(FIFO_DEPTH) 
+); 
+    /* Packages */
+    import Tx_Arbiter_Package::*;
     logic                   wr_en;
     logic                   rd_en;
-    logic [2:0]             wr_mode;
+    logic [1:0]             wr_mode;
     logic [1:0]             rd_mode;
     Tx_Arbiter_Sources_t    wr_data_1;
     Tx_Arbiter_Sources_t    wr_data_2;
-    Tx_Arbiter_Sources_t    wr_data_3;
-    Tx_Arbiter_Sources_t    wr_data_4;
-
     Tx_Arbiter_Sources_t    rd_data_1;
     Tx_Arbiter_Sources_t    rd_data_2;
+    logic [ADDR_WIDTH  : 0] available;
+
+
 
 
     modport ARBITER_FSM_SEQUENCE_RECORDER (
@@ -129,13 +158,11 @@ interface Tx_Arbiter_Sequence_Recorder #(
                 wr_data_1,
                 wr_data_2,
                 
-        input   available,
-                rd_data_1,
-                rd_data_2
-
+        input   rd_data_1,
+                rd_data_2,
+                available
     );
-
-
+    
     modport SEQUENCE_RECORDER_ARBITER_FSM (
         input   rd_en,
                 wr_en,
@@ -144,47 +171,13 @@ interface Tx_Arbiter_Sequence_Recorder #(
                 wr_data_1,
                 wr_data_2,
                 
-        output  available,
-                rd_data_1,
-                rd_data_2
-
+        output  rd_data_1,
+                rd_data_2,
+                available
     );
 
+endinterface: Arbiter_FSM_Sequence_Recorder
 
 
 
-    modport TX_ARBITER_SEQUENCE_RECORDER (
-        output  wr_en,
-                rd_en,
-                wr_mode,
-                rd_mode,
-                wr_data_1,
-                wr_data_2,
-                wr_data_3,
-                wr_data_4,
-
-        input   empty,
-                full,
-                available,
-                rd_data_1,
-                rd_data_2
-    );
-
-    modport SEQUENCE_RECORDER_TX_ARBITER (
-        input   wr_en,
-                rd_en,
-                wr_mode,
-                rd_mode,
-                wr_data_1,
-                wr_data_2,
-                wr_data_3,
-                wr_data_4,
-
-        output  empty,
-                full,
-                available,
-                rd_data_1,
-                rd_data_2
-    );
-endinterface: Tx_Arbiter_Sequence_Recorder
 /*********** END_OF_FILE ***********/

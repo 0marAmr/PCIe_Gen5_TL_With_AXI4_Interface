@@ -1,0 +1,5 @@
+#set search_path "$search_path /home/ICer/Desktop/AUC_Midterm/Midterm/Library"
+#set target_library saed32hvt_ff0p95v125c.db
+#set link_library "* $target_library"
+alias h history
+alias rc "report_constraint -all_violators"

@@ -133,8 +133,6 @@ always_comb begin : Next_State_Decoder
             next = IDLE_State;
         end
     end
-    default: begin
-    end
     endcase 
 end 
 
@@ -264,9 +262,6 @@ always_comb begin : Output_Decoder
 
         // P2A_Cpl_if.Cpl_Grant            = 1'b0;
         // P2A_Cpl_if.Cpl_Command          = 1'b0;
-    end
-    default: begin
-        /* take default values */
     end
     endcase 
 end

@@ -10,58 +10,33 @@
 /********************************************************************/
 
 // import package
-import data_frag_package::*;
+import Fragmentation_Package::*;
+import axi_slave_package::*; 
+
 
 // Define the interface of buffer used in data fragmentation
-interface buffer_frag_interface ();
-    logic                          wr_en       ; 
-    logic [COUNT_WIDTH - 1 : 0]    empty_loc   ;
-    logic [WR_DATA_WIDTH - 1 : 0]   data_in     ; 
-    logic [NO_LOC_WR_WIDTH - 1 : 0] no_loc_wr   ;
+interface buffer_frag_interface;
+    logic                               wr_en       ; 
+    logic     			                empty   ;
+    logic [WR_DATA_WIDTH - 1 : 0]       data_in     ; 
+    logic [NO_LOC_WR_WIDTH - 1 : 0]     no_loc_wr   ;
     
-    
-    // Signals for interfacing to DATA Fragmentation
-    logic                           rd_en       ;  
-    logic                           rd_mode     ;  // 0 for read one location -- and 1 for read 2 location
-    logic [4* DW - 1 : 0 ]          rd_data_1   ;
-    logic [4* DW - 1 : 0 ]          rd_data_2   ;    
-    logic [COUNT_WIDTH - 1 : 0]     Count       ;  // COUNT WIDTH = 9 : Represent No. of Stored 
-
         
-    modport buffer (
+    modport buffer_arbiter (
         input       wr_en,
                     data_in,
                     no_loc_wr,
-                    rd_en,
-                    rd_mode,
-        output      rd_data_1,
-                    rd_data_2,
-                    empty_loc,
-                    Count
+
+        output      empty
     );
 
-    modport buffer_tb (
-        output       wr_en,
-                    data_in,
-                    no_loc_wr,
-                    rd_en,
-                    rd_mode,
-        input      rd_data_1,
-                    rd_data_2,
-                    empty_loc,
-                    Count
-    );
-
-
-    
     modport arbiter_buffer (
         output      wr_en,
                     data_in,
                     no_loc_wr,
 
-        input       empty_loc
-
-);
+        input       empty
+    );
 
 
 

@@ -24,6 +24,8 @@
                     input logic   [AWFIFO_WIDTH - 1 : 0] AWFIFO_DATA,   // it is a read location from aw fifo 
 
                     input logic   [REQUESTER_ID_WIDTH - 1 : 0] Requester_ID,  // it will be hardwired in top module, coming from CFG space
+                    input logic                                 config_ecrc,    // this bit from configuration indicate ecrc generation is enabled
+
 
                     output tlp_header_t axi_wrreq_hdr,  // generated header of request, the data type if tlp_header (struct cover 4 DW of Header including all fields)
 
@@ -63,8 +65,8 @@
             
 
             // Internal Signals used to store actual No. of DW
-            logic [LAST_BYTE_EN_WIDTH  : 0]  no_of_dw;
-            logic [LAST_BYTE_EN_WIDTH  : 0]     no_of_dw_in_beat;
+            logic [LAST_BYTE_EN_WIDTH + 2'b11  : 0]  no_of_dw;
+            logic [LAST_BYTE_EN_WIDTH + 2'b11  : 0]     no_of_dw_in_beat;
 
             logic [WSTRB_WIDTH - 1 : 0] WSTRB ;
             logic [AWUSER_WIDTH - 1 : 0] AWUser ;
@@ -78,15 +80,16 @@
             function  [TAG_WIDTH - 2:0] generate_tag;
                 input [$clog2(AWFIFO_DEPTH) - 1 :0] id;
                 begin
+                    generate_tag[$clog2(AWFIFO_DEPTH) - 1 :0] = id;
 
-                    if (TAG_WIDTH - ($clog2(AWFIFO_DEPTH)) > 1'b1 ) begin
-                        // Generate a unique 7-bit tag value based on the (4 or 5 or 6) -bit ID input
-                        generate_tag[$clog2(AWFIFO_DEPTH) - 1 :0] = id;
-                        generate_tag[TAG_WIDTH - 2 :$clog2(AWFIFO_DEPTH)] = {{4'b0, id} ^ 8'b10101010};
-                    end
-                    else  begin
-                        generate_tag[TAG_WIDTH - 2 :0] = id;
-                    end
+                    // if (TAG_WIDTH - ($clog2(AWFIFO_DEPTH)) > 1'b1 ) begin
+                    //     // Generate a unique 7-bit tag value based on the (4 or 5 or 6) -bit ID input
+                    //     generate_tag[$clog2(AWFIFO_DEPTH) - 1 :0] = id;
+                    //     generate_tag[TAG_WIDTH - 2 :$clog2(AWFIFO_DEPTH)] = {{4'b0, id} ^ 8'b10101010};
+                    // end
+                    // else  begin
+                    //     generate_tag[TAG_WIDTH - 2 :0] = id;
+                    // end
                 end
             endfunction
  
@@ -114,7 +117,6 @@
                                 axi_wrreq_hdr   = 'd0 ;
                         end
                         3'b0_01: begin   /*  32-bit Address -  MemWr Request */
-
                             // Enable mapper
                                 axi_wrreq_hdr_valid     = 1'b1;
 
@@ -127,7 +129,7 @@
                                 axi_wrreq_hdr.ATTR  = 1'b1 ;
                                 axi_wrreq_hdr.LN    = 1'b0 ;
                                 axi_wrreq_hdr.TH    = 1'b0 ;
-                                axi_wrreq_hdr.TD    = 1'b0 ;
+                                axi_wrreq_hdr.TD    = (config_ecrc) ? 1'b1: 1'b0 ; 
                                 axi_wrreq_hdr.EP    = 1'b0 ;
                                 axi_wrreq_hdr.Attr  = 'b10  ;
                                 axi_wrreq_hdr.AT    = 'b0  ;
@@ -198,7 +200,7 @@
                                 axi_wrreq_hdr.ATTR  = 1'b1 ;
                                 axi_wrreq_hdr.LN    = 1'b0 ;
                                 axi_wrreq_hdr.TH    = 1'b0 ;
-                                axi_wrreq_hdr.TD    = 1'b0 ;
+                                axi_wrreq_hdr.TD    = (config_ecrc) ? 1'b1: 1'b0 ;
                                 axi_wrreq_hdr.EP    = 1'b0 ;
                                 axi_wrreq_hdr.Attr  = 'b10  ;
                                 axi_wrreq_hdr.AT    = 'b0  ;
@@ -265,7 +267,7 @@
                                 axi_wrreq_hdr.ATTR  = 1'b1 ;
                                 axi_wrreq_hdr.LN    = 1'b0 ;
                                 axi_wrreq_hdr.TH    = 1'b0 ;
-                                axi_wrreq_hdr.TD    = 1'b0 ;
+                                axi_wrreq_hdr.TD    = (config_ecrc) ? 1'b1: 1'b0 ;
                                 axi_wrreq_hdr.EP    = 1'b0 ;
                                 axi_wrreq_hdr.Attr  = 'b10  ;
                                 axi_wrreq_hdr.AT    = 'b0  ;
@@ -317,7 +319,7 @@
                             endcase
 
                             // Calculating Lower Address and Higher Address
-                            axi_wrreq_hdr.Higher_Address        = AWADDR [64:32] ; 
+                            axi_wrreq_hdr.Higher_Address        = AWADDR [63:32] ; 
                             axi_wrreq_hdr.Lower_Address         = AWADDR [31:2];
                             axi_wrreq_hdr.PH                    = 2'b00;
                        
@@ -335,8 +337,8 @@
                     endcase 
 
                 if (AWUser == 3'b0_01 || AWUser == 3'b1_01 ) begin 
-                    case (AWSize)                                                                   
-                        'd0 : begin 
+                    case (AWSize)                                                                  
+                        3'd0 : begin 
                                     // Here Each Beat is 1 Byte -->  so to calc. no. of DW via no. beats using the following location
                                     no_of_dw =  (AWLEN+1'b1)  >> 2 ; // # DW = AWLEN * AWSIZE = AWLEN * 1 / 4
                                     // There are 3 Choices for answer (3/4 = 0 ; 5/4 = 1 ; 4/4 = 1)
@@ -358,7 +360,7 @@
                                         axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                     end 
                         end 
-                        'd1 : begin 
+                        3'd1 : begin 
                             // Here Each Beat is 2 Byte -->  so to calc. no. of DW via no. beats using the following location
                             // axi_wrreq_hdr.last_DW_BE = {'b00 , WSTRB[1:0]};   // STRB in this case is 1 bit but physically the bus is 128 bit to include other cases
                             no_of_dw =  (AWLEN+1'b1 ) >> 1 ; // # DW = AWLEN * 2 / 4
@@ -375,13 +377,13 @@
                             end
 
                             if (axi_wrreq_hdr.Length != 1'b1) begin 
-                                axi_wrreq_hdr.last_DW_BE = {'b00 , WSTRB[1:0]};   // STRB in this case is 1 bit but physically the bus is 128 bit to include other cases
+                                axi_wrreq_hdr.last_DW_BE = {2'b00 , WSTRB[1:0]};   // STRB in this case is 1 bit but physically the bus is 128 bit to include other cases
                             end 
                             else begin 
                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                             end 
                         end 
-                        'd2 : begin 
+                        3'd2 : begin 
                             // Here Each Beat is 4 Byte, so no_dw_of_beat = 1
                             // axi_wrreq_hdr.last_DW_BE = WSTRB[3:0];
                             axi_wrreq_hdr.Length     = AWLEN  + 1'b1   ; 
@@ -393,7 +395,7 @@
                             end 
                             
                         end 
-                        'd3 : begin 
+                        3'd3 : begin 
                             // Here Each Beat is 8 Byte, so no_dw_of_beat = 2 
                             if (WSTRB[7:4] == 4'b0000) begin 
                                 axi_wrreq_hdr.Length = (AWLEN)  * 2 + 1 ;
@@ -437,10 +439,10 @@
 
                             */
                         end
-                        'd4 : begin 
+                        3'd4 : begin 
                             // Here Each Beat is 16 Byte, so no_dw_of_beat = 4 
                             casez (WSTRB)
-                                'b0000_0000_0000_????: begin 
+                                {124'b0,4'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 1;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[3:0] ;
@@ -449,7 +451,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end 
                                 end
-                                'b0000_0000_????_????: begin 
+                                {120'b0,8'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 2;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[7:4] ;
@@ -458,7 +460,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end                                             
                                                         end 
-                                'b0000_????_????_????: begin 
+                                {116'b0,12'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 3;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[11:8] ;
@@ -480,10 +482,10 @@
                             endcase 
 
                         end 
-                        'd5 : begin
+                        3'd5 : begin
 
                             casez (WSTRB)
-                                'b0000_0000_0000_0000_0000_0000_0000_????: begin 
+                                {124'b0,4'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 1;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[3:0] ; 
@@ -492,7 +494,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end   
                                 end
-                                'b0000_0000_0000_0000_0000_0000_????_????: begin 
+                                {120'b0,8'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 2;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[7:4] ; 
@@ -501,7 +503,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end   
                                 end
-                                'b0000_0000_0000_0000_0000_????_????_????: begin 
+                                {116'b0,12'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 3;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[11:8] ;  
@@ -510,7 +512,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end   
                                 end
-                                'b0000_0000_0000_0000_????_????_????_????: begin 
+                                {112'b0,16'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 4;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[15:12] ;  
@@ -519,7 +521,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end   
                                 end
-                                'b0000_0000_0000_????_????_????_????_????: begin 
+                                {108'b0,20'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 5;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[19:16] ;  
@@ -528,7 +530,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end   
                                 end
-                                'b0000_0000_????_????_????_????_????_????: begin 
+                                {104'b0,24'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 6;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[23:20] ;  
@@ -537,7 +539,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end   
                                 end
-                                'b0000_????_????_????_????_????_????_????: begin 
+                                {100'b0,28'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 7;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[27:24] ;  
@@ -558,9 +560,9 @@
                             endcase
 
                         end 
-                        'd6 : begin
+                        3'd6 : begin
                             casez (WSTRB)
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_????: begin 
+                                    {124'b0,4'b?}: begin 
                                                             axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 1;
                                                             if (axi_wrreq_hdr.Length != 1'b1) begin 
                                                                 axi_wrreq_hdr.last_DW_BE = WSTRB[3:0] ; 
@@ -569,7 +571,7 @@
                                                                 axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                                             end   
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_????_????: begin 
+                                    {120'b0,8'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 2;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[7:4] ;
@@ -578,7 +580,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end   
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_????_????_????: begin 
+                                    {116'b0,12'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 3;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[11:8] ; 
@@ -587,7 +589,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_????_????_????_????: begin 
+                                    {112'b0,16'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 4;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[15:12] ; 
@@ -596,7 +598,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_????_????_????_????_????: begin 
+                                    {108'b0,20'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 5;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[19:16] ; 
@@ -605,7 +607,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_0000_0000_????_????_????_????_????_????: begin 
+                                    {104'b0,24'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 6;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[23:20] ; 
@@ -614,7 +616,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_0000_????_????_????_????_????_????_????: begin 
+                                    {100'b0,28'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 7;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[27:24] ; 
@@ -623,7 +625,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_0000_????_????_????_????_????_????_????_????: begin 
+                                    {96'b0,32'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 8;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[31:28] ; 
@@ -632,7 +634,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_0000_????_????_????_????_????_????_????_????_????: begin 
+                                    {92'b0,36'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 9;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[35:32] ; 
@@ -641,16 +643,15 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_0000_0000_????_????_????_????_????_????_????_????_????_????: begin 
+                                    {88'b0,40'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 10;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[39:36] ;                                                    end 
                                         else begin 
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
-                                         
                                     end
-                                    'b0000_0000_0000_0000_0000_????_????_????_????_????_????_????_????_????_????_????: begin 
+                                    {84'b0,44'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 11;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[43:40] ; 
@@ -659,7 +660,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end  
                                     end
-                                    'b0000_0000_0000_0000_????_????_????_????_????_????_????_????_????_????_????_????: begin 
+                                    {80'b0,48'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 12;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[47:44] ; 
@@ -668,7 +669,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end 
                                     end
-                                    'b0000_0000_0000_????_????_????_????_????_????_????_????_????_????_????_????_????: begin 
+                                    {76'b0,52'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 13;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[51:48] ; 
@@ -677,7 +678,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end 
                                     end
-                                    'b0000_0000_????_????_????_????_????_????_????_????_????_????_????_????_????_????: begin 
+                                    {72'b0,56'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 14;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[55:52] ; 
@@ -686,7 +687,7 @@
                                             axi_wrreq_hdr.last_DW_BE = {4'b0000};
                                         end 
                                     end
-                                    'b0000_????_????_????_????_????_????_????_????_????_????_????_????_????_????_????: begin 
+                                    {68'b0,60'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 15;
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[59:56] ; 
@@ -706,10 +707,11 @@
                                     end 
                             endcase
                             end 
-                        'd7 : begin 
+                        3'd7 : begin 
                                 casez(WSTRB)
                                     {124'b0,4'b?}: begin 
                                         axi_wrreq_hdr.Length = AWLEN  * no_of_dw_in_beat + 1;
+
                                         if (axi_wrreq_hdr.Length != 1'b1) begin 
                                             axi_wrreq_hdr.last_DW_BE = WSTRB[3:0] ; 
                                         end 
@@ -1006,8 +1008,9 @@
                 
                 end  
         end 
-        always_comb 
-         begin 
+
+    always_comb 
+        begin 
             // Put Constraint on Arbiter to set grant to be in one clk cycle
             if (axi_req_wr_grant)
                 begin 
@@ -1022,11 +1025,6 @@
                     recorder_if.req_wr_data = 'b0;
                 end 
             end 
-
-            // always_comb 
-            //  begin 
-            //        if (axi_req_wr_grant &&  )
-            //  end 
 
     endmodule 
 

@@ -84,25 +84,16 @@ always_ff @(posedge CLK or negedge ARESTn) begin
     end
     else begin
             current_state           <= next_state ;
-
-
-
-
-            if (current_state == AW_Pop)
-                begin 
-                        num_cycles <= (AWLEN + 1);  // Load 
-                end
-                // Last &&  
-            else if ((current_state == W_Pop) )
-                begin 
-                    if ((AWLEN != 1'b1) )
-                         num_cycles <= num_cycles - 1'b1 ;
-                end
+            if (current_state == AW_Pop) begin 
+                num_cycles <= (AWLEN + 1);  // Load 
+            end
+            else if ((current_state == W_Pop) )begin 
+                if ((num_cycles != 1'b0) )
+                    num_cycles <= num_cycles - 1'b1 ;
+            end
             else begin 
                 num_cycles <= 1'b0;  
             end
-            
-
     end
 end
 
@@ -115,28 +106,15 @@ always_comb begin
             aw_fifo_if.FIFO_rd_en =  1'b0 ;
             w_fifo_if.FIFO_rd_en =   1'b0 ;
             
-            
                 case (current_state)
                         wr_pop_Idle : begin  
-                                    next_state = wr_pop_Idle;
-                                    wr_atop_en = 1'b0;
-                                    axi_req_data = 'b0 ;
-                                    aw_fifo_if.FIFO_rd_en =  1'b0 ;
-                                    w_fifo_if.FIFO_rd_en =   1'b0 ;
-                                    
                                 if (!aw_fifo_if.FIFO_empty) begin 
                                     next_state = AW_Pop;
-                                    wr_atop_en = 1'b0;
-                                    axi_req_data ='b0 ;
                                     aw_fifo_if.FIFO_rd_en =  1'b1 ;
                                     w_fifo_if.FIFO_rd_en =   1'b1 ;
                                 end 
                                 else  begin
                                     next_state = wr_pop_Idle;
-                                    wr_atop_en = 1'b0;
-                                    axi_req_data ='b0 ;
-                                    aw_fifo_if.FIFO_rd_en =  1'b0 ;
-                                    w_fifo_if.FIFO_rd_en =   1'b0 ;
                                 end
                         end 
                         AW_Pop : begin 
@@ -145,48 +123,35 @@ always_comb begin
                                     aw_fifo_if.FIFO_rd_en =  1'b0 ;
                                     w_fifo_if.FIFO_rd_en =   1'b0 ;
 
-
-
-                                    if (axi_req_wr_grant == 1'b1 &&  AWLEN!= 1'b1) begin
+                                    if (axi_req_wr_grant == 1'b1 &&  AWLEN != 1'b0) begin
                                             next_state = W_Pop ;
+                                            w_fifo_if.FIFO_rd_en =   1'b1 ;
+
+
                                     end 
-                                    else if (axi_req_wr_grant == 1'b1 &&  AWLEN == 1'b1) begin
+                                    else if (axi_req_wr_grant == 1'b1 &&  AWLEN == 1'b0) begin
                                             next_state = wr_pop_Idle;
                                     end 
                                     else begin  
                                         next_state = AW_Pop ;
                                     end 
-                                    
                                     end
-                         
                         W_Pop : begin
-                                            if ( num_cycles!= 1'b1) begin
-                                                next_state = W_Pop ;
-                                                wr_atop_en = 1'b1;
-                                                axi_req_data = w_fifo_if.FIFO_rd_data;
-                                                aw_fifo_if.FIFO_rd_en =  1'b0 ;
-                                                w_fifo_if.FIFO_rd_en =   1'b1 ;
-                                            end 
-                                            else if (num_cycles == 1'b1)  begin
-                                                next_state = wr_pop_Idle;
-
-                                                wr_atop_en = 1'b1;
-                                                axi_req_data = w_fifo_if.FIFO_rd_data;
-                                                aw_fifo_if.FIFO_rd_en =  1'b0 ;
-                                                w_fifo_if.FIFO_rd_en =   1'b0 ;
-                                            end 
-                                            else  begin 
-                                            next_state = W_Pop;
-
-                                                wr_atop_en = 1'b1;
-                                                axi_req_data = w_fifo_if.FIFO_rd_data;
-                                                aw_fifo_if.FIFO_rd_en =  1'b0 ;
-                                                w_fifo_if.FIFO_rd_en =   1'b0 ;
-                                            end 
-
-                                            
-                                        end
+                                    if ( num_cycles!= 1'b1) begin
+                                        next_state = W_Pop ;
+                                        wr_atop_en = 1'b1;
+                                        axi_req_data = w_fifo_if.FIFO_rd_data;
+                                        aw_fifo_if.FIFO_rd_en =  1'b0 ;
+                                        w_fifo_if.FIFO_rd_en =   1'b1 ;
+                                    end 
+                                    else  begin
+                                        next_state = wr_pop_Idle; 
+                                        wr_atop_en = 1'b1;
+                                        axi_req_data = w_fifo_if.FIFO_rd_data;
+                                        aw_fifo_if.FIFO_rd_en =  1'b0 ;
+                                        w_fifo_if.FIFO_rd_en =   1'b0 ;
+                                    end 
+                                end
                 endcase
             end 
-
 endmodule : fifo_pop_wr

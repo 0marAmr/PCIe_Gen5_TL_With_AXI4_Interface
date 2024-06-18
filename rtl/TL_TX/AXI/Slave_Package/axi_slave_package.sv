@@ -13,7 +13,7 @@
 package axi_slave_package ;
     /***********************************************************/
     /*------------ PARAMETERS For Channels ------------------ */ 
-        parameter       ADDR_WIDTH            = 64   ,
+        localparam      ADDR_WIDTH            = 64   ,
                         AXI_MAX_NUM_BYTES     = 128  ,   // per beat, we can send 128 Byte as max. payload
                         AXI_MAX_NUM_TRANSFERS = 256  ,   // maximum number of beats 
         
@@ -32,21 +32,21 @@ package axi_slave_package ;
                         AxSIZE_WIDTH          =  3   ,
                         WSTRB_WIDTH           = AXI_MAX_NUM_BYTES ; 
 
-
+    
     /***********************************************************/
     /*------------ PARAMETERS for FIFOs --------------------- */ 
         
         // Depth of FIFOs
-        parameter int   AWFIFO_DEPTH          =   16  ,  // Usually it will be same for all fifos
-                        ARFIFO_DEPTH          =   16  ,
-                        WFIFO_DEPTH           =   16  ,
-                        RFIFO_DEPTH           =   16  ,
-                        BFIFO_DEPTH           =   16  ;
+        localparam  AWFIFO_DEPTH =   256  ,  // Usually it will be same for all fifos
+                    ARFIFO_DEPTH =   256  ,
+                    WFIFO_DEPTH  =   256  ,
+                    RFIFO_DEPTH  =   256  ,
+                    BFIFO_DEPTH  =   256  ;
 
         // Width of location in FIFOs
-        parameter int   AWFIFO_WIDTH            = $clog2(AWFIFO_DEPTH ) + ADDR_WIDTH + $clog2(AXI_MAX_NUM_TRANSFERS) + AxSIZE_WIDTH + AxBURST_WIDTH + AWUSER_WIDTH + WSTRB_WIDTH ,
-                        ARFIFO_WIDTH            = $clog2(ARFIFO_DEPTH ) + ADDR_WIDTH + $clog2(AXI_MAX_NUM_TRANSFERS) + AxSIZE_WIDTH + AxBURST_WIDTH + ARUSER_WIDTH ,
-                        WFIFO_WIDTH             = AXI_MAX_NUM_BYTES*4; // + $clog2(WFIFO_DEPTH) + $clog2(AXI_MAX_NUM_BYTES) + 1  ,
+        localparam  AWFIFO_WIDTH = $clog2(AWFIFO_DEPTH) + ADDR_WIDTH + $clog2(AXI_MAX_NUM_TRANSFERS) + AxSIZE_WIDTH + AxBURST_WIDTH + AWUSER_WIDTH + WSTRB_WIDTH ,
+                    ARFIFO_WIDTH = $clog2(ARFIFO_DEPTH) + ADDR_WIDTH + $clog2(AXI_MAX_NUM_TRANSFERS) + AxSIZE_WIDTH + AxBURST_WIDTH + ARUSER_WIDTH ,
+                    WFIFO_WIDTH  = AXI_MAX_NUM_BYTES*8; // + $clog2(WFIFO_DEPTH) + $clog2(AXI_MAX_NUM_BYTES) + 1  ,
 
         localparam  B_FIFO_DATA_WIDTH                   = 10,       // BID: 8bits, BRESP: 2bits
                     B_FIFO_DEPTH                        = 16,
@@ -56,7 +56,7 @@ package axi_slave_package ;
                         
     /***********************************************************/
     /*------------ PARAMETERS for FIFOs --------------------- */
-        parameter CLK_PERIOD = 10; // define clock period of AXI  
+        localparam CLK_PERIOD = 10; // define clock period of AXI  
 
 
     /***********************************************************/
@@ -71,7 +71,7 @@ package axi_slave_package ;
     /**************************************************************/
     //----------------------------- Parameter Definition ------------------------//
 
-    parameter   DW                      = 4  * 8   ,          /* DW ---> Data Width in bits      */
+    localparam   DW                      = 4  * 8   ,          /* DW ---> Data Width in bits      */
                 HDR_WIDTH               = 4  * DW  ,          // HDR width in bits 
                 FMT_WIDTH               = 3        ,
                 TYP_WIDTH               = 5        , 
@@ -133,7 +133,7 @@ package axi_slave_package ;
 
 
 
-    parameter REQUESTER_ID = 16'hffff;
+    localparam REQUESTER_ID = 16'hffff;
 
     typedef enum reg[1:0] {wr_pop_Idle = 2'b00 , AW_Pop = 2'b10 , W_Pop = 2'b11 }                  request_pop_fsm_wr_state ;   // state used in fsm of write requests
     typedef enum reg      {rd_pop_Idle = 1'b0 , AR_Pop = 1'b1 }                                    request_pop_fsm_rd_state ;   // state used in fsm of read requests
@@ -157,7 +157,7 @@ package axi_slave_package ;
             logic       T8;
             logic       Attr1;
             logic       LN;
-            logic       TH;            
+            logic       TH;
             logic       TD;
             logic       EP;
             logic [1:0] Attr2;
@@ -176,7 +176,7 @@ package axi_slave_package ;
     } Cpl_TLP_HDR_t;
     
     /******************** TLP TYPE Encoding ********************/
-    parameter logic [4:0]   TLP_TYPE_3DW_MRD      = 5'b0_0000,  // Memory Read Request (32-bits Address)         
+    localparam logic [4:0]   TLP_TYPE_3DW_MRD      = 5'b0_0000,  // Memory Read Request (32-bits Address)         
                             TLP_TYPE_4DW_MRD      = 5'b0_0000,  // Memory Read Request (64-bits Address)        
                             TLP_TYPE_3DW_MRDLK    = 5'b0_0001,  // Memory Read Request-Locked (32-bits Address)        
                             TLP_TYPE_4DW_MRDLK    = 5'b0_0001,  // Memory Read Request-Locked (64-bits Address)        
@@ -229,7 +229,7 @@ package axi_slave_package ;
 
     /******************** B Channel Signal out from Slave ********************/
     typedef struct {
-        logic [7:0]                 BID;
+        logic [$clog2(AWFIFO_DEPTH) - 1:0]                 BID;
         logic                       BVALID;
         Resp_t                      BRESP;
     } B_Channel_Slv_t;
@@ -241,7 +241,7 @@ package axi_slave_package ;
 
     /******************** R Channel Signal out from Slave ********************/
     typedef struct {
-        logic [7:0]                 RID;
+        logic [$clog2(AWFIFO_DEPTH) - 1:0]                 RID;
         logic                       RVALID;
         logic [1023 : 0]            RDATA;   
         Resp_t                      RRESP;
@@ -289,10 +289,10 @@ package axi_slave_package ;
     } bool_t; 
 
     /******************** Parameters ********************/
-    parameter REQUESTER_RECORDER_WIDTH      = $clog2(AWFIFO_DEPTH) + 1'b1 , // AWID Width equals to clog2(AWFIFO_DEPTH)
-              REQUESTER_RECORDER_DEPTH      = 2**TAG_WIDTH  ,  // the summation of AWFIFO and ARFIFO DEPTH
-              REQUESTER_RECORDER_ADDR_WIDTH = $clog2(REQUESTER_RECORDER_DEPTH ),  
-              ID_WIDTH                      = $clog2(AWFIFO_DEPTH);  
+    localparam REQUESTER_RECORDER_WIDTH      = $clog2(AWFIFO_DEPTH) + 1 , // AWID Width equals to clog2(AWFIFO_DEPTH)
+               REQUESTER_RECORDER_DEPTH       = 2**TAG_WIDTH  ,  // the summation of AWFIFO and ARFIFO DEPTH
+               REQUESTER_RECORDER_ADDR_WIDTH  = $clog2(REQUESTER_RECORDER_DEPTH ),  
+               ID_WIDTH                       = $clog2(AWFIFO_DEPTH);  
 
 
 endpackage

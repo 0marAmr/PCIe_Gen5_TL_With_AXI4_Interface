@@ -18,7 +18,7 @@ import axi_slave_package::*;
 
 module fifo_pop_rd (
     // Global Signal 
-    input bit CLK , ARESTn ,
+    input bit clk , ARESTn ,
 
     // Interface with AW FIFO and W FIFO
     // FIFOs_if.pop_rd_atop  rd_fifos_if,
@@ -66,7 +66,7 @@ end
 
 
 
-    always_ff @(posedge CLK or negedge ARESTn) begin
+    always_ff @(posedge clk or negedge ARESTn) begin
             if (!ARESTn) begin 
                 current_state <= rd_pop_Idle;
             end 
@@ -74,51 +74,33 @@ end
                 current_state <= next_state;
             end 
     end
-    /*
-        output :    rd_atop_en
-                    ARFIFO_rd_en
 
-        Input :     axi_req_rd_grant
-                    ARFIFO_rd_data,
-                    ARFIFO_empty
-
-*/
+    // note. here we want to make a seperation between 2 valids so must go to idle 
     always_comb begin 
         case (current_state)
             rd_pop_Idle : begin 
-                        rd_atop_en = 1'b0 ;
-                        ar_fifo_if.FIFO_rd_en = 1'b0 ;
-
+                        rd_atop_en             = 1'b0 ;
                         if (ar_fifo_if.FIFO_empty == 1'b0)
-                            begin 
-                                    next_state = AR_Pop ;
-                                    rd_atop_en = 1'b0 ;
-                                    ar_fifo_if.FIFO_rd_en = 1'b1 ;
-
-                            end 
+                        begin 
+                            next_state             = AR_Pop ;
+                            ar_fifo_if.FIFO_rd_en  = 1'b1 ;
+                        end 
                         else
                         begin 
-                                    next_state = rd_pop_Idle ;
-                                    rd_atop_en = 1'b0 ;
-                                    ar_fifo_if.FIFO_rd_en = 1'b0 ;
+                            next_state = rd_pop_Idle ;
+                            ar_fifo_if.FIFO_rd_en  = 1'b0 ;
                         end
                       end  
             AR_Pop : begin 
-                        rd_atop_en = 1'b1 ;
-                        ar_fifo_if.FIFO_rd_en = 1'b0 ;
-
+                        rd_atop_en         = 1'b1 ;
+                        ar_fifo_if.FIFO_rd_en  = 1'b0 ;
                         if (axi_req_rd_grant )
                             begin 
                                 next_state = rd_pop_Idle ;
-                                rd_atop_en = 1'b0 ;
-                                ar_fifo_if.FIFO_rd_en = 1'b0 ;
                             end 
                         else begin 
                                 next_state = AR_Pop ;
-                                rd_atop_en = 1'b1 ;
-                                ar_fifo_if.FIFO_rd_en = 1'b0 ;
                         end 
-                
             end 
         endcase
     end 

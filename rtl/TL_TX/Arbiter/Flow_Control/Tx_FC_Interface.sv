@@ -9,7 +9,6 @@
 interface Tx_FC_Interface #(
     parameter   FC_HDR_WIDTH    = 12,
                 FC_DATA_WIDTH   = 16
-)(
 );
     import Tx_Arbiter_Package::*;
     logic [9:0]                     PTLP_1;

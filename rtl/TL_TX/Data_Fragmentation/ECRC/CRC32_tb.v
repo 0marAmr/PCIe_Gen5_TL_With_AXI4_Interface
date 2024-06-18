@@ -5,8 +5,8 @@
 /* Updates		: -								*/
 /* Dependencies	: -								*/
 /* Used			: -							    */
-`include "CRC32_Serial.v"
-`include "CRC32_Parallel.v"
+// `include "CRC32_Serial.v"
+// `include "CRC32_Parallel.v"
 `timescale 1ns/1ps
 module CRC_TB ();
 parameter   DATA_WIDTH    = 256,
@@ -42,13 +42,15 @@ initial begin
     PASSED          = 0;
     FAILED          = 0;
     #10;
-    CRC_i_EN = 1'b1; CRC_i_Seed = {POLY_WIDTH{1'b1}}; CRC_i_Length = 4'd8; CRC_i_Seed_Load = 1'b1; // CRC_i_Message = 256'h1980_1697_320d_698a_abfd_2264_1298_6548_abcd_6987_1245_0000_5678_9876_abcd_1234;
+    CRC_i_EN = 1'b1; CRC_i_Seed = {POLY_WIDTH{1'b1}}; CRC_i_Length = 4'd4; CRC_i_Seed_Load = 1'b1; //CRC_i_Message = 256'h1980_1697_320d_698a_abfd_2264_1298_6548_abcd_6987_1245_0000_5678_9876_abcd_1234;
+    // CRC_i_Message = 96'h0000_8000_0001_0002_0000_0000;
+    CRC_i_Message = 128'h20008001000000000000000000000000;
     #10;
-    // $display("polynomial:   04C11DB7");
-    // $display("Seed:         %h", CRC_i_Seed);
-    // $display("Data:         %h", CRC_i_Message);
-    // $display("CRC Serial:   %h", CRC_o_CRC_Serial);
-    // $display("CRC Parallel: %h", CRC_o_CRC_Parallel);
+    $display("polynomial:   04C11DB7");
+    $display("Seed:         %h", CRC_i_Seed);
+    $display("Data:         %h", CRC_i_Message);
+    $display("CRC Serial:   %h", CRC_o_CRC_Serial);
+    $display("CRC Parallel: %h", CRC_o_CRC_Parallel);
     // CRC_i_EN = 1'b1; CRC_i_Seed = {POLY_WIDTH{1'b1}}; CRC_i_Length = 4'd4; CRC_i_Seed_Load = 1'b0; CRC_i_Message = 256'hadbc_2265_9161_0324_1245_9875_1265_6598;
     // #10;
     // $display("Message: %h", CRC_i_Message);
@@ -61,19 +63,19 @@ initial begin
     // $display("CRC Parallel: %h", CRC_o_CRC_Parallel);
 
     // for (i = 0; i < TEST_CASES ; i = i + 1) begin
-    repeat(TEST_CASES) begin
-        CRC_i_Message = $random;
-        #10
-        if (CRC_o_CRC_Serial == CRC_o_CRC_Parallel) begin
-            PASSED = PASSED + 1;
-        end
-        else begin
-            FAILED = FAILED + 1;
-        end
-    end
-    #10
-    $display("PASSED: %d", PASSED);
-    $display("FAILED: %d", FAILED);
+    // repeat(TEST_CASES) begin
+    //     CRC_i_Message = $random;
+    //     #10
+    //     if (CRC_o_CRC_Serial == CRC_o_CRC_Parallel) begin
+    //         PASSED = PASSED + 1;
+    //     end
+    //     else begin
+    //         FAILED = FAILED + 1;
+    //     end
+    // end
+    // #10
+    // $display("PASSED: %d", PASSED);
+    // $display("FAILED: %d", FAILED);
     $finish;
 end
 

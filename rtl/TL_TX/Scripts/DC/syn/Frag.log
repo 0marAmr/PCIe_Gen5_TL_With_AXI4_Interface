@@ -1,0 +1,528 @@
+
+                           Design Compiler Graphical 
+                                 DC Ultra (TM)
+                                  DFTMAX (TM)
+                              Power Compiler (TM)
+                                 DesignWare (R)
+                                 DC Expert (TM)
+                               Design Vision (TM)
+                               HDL Compiler (TM)
+                               VHDL Compiler (TM)
+                                  DFT Compiler
+                               Design Compiler(R)
+
+               Version O-2018.06-SP1 for linux64 - Jul 19, 2018 
+
+                    Copyright (c) 1988 - 2018 Synopsys, Inc.
+   This software and the associated documentation are proprietary to Synopsys,
+ Inc. This software may only be used in accordance with the terms and conditions
+ of a written license agreement with Synopsys, Inc. All other use, reproduction,
+            or distribution of this software is strictly prohibited.
+Initializing...
+Initializing gui preferences from file  /home/ICer/.synopsys_dv_prefs.tcl
+################################# Define Top Module #################################
+set design data_frag_top
+data_frag_top
+################################# Set Search Path ###################################
+set_app_var search_path /home/ICer/Desktop/Final-Project/SAED32_2012-12-25/lib/stdcell_hvt/db_nldm
+/home/ICer/Desktop/Final-Project/SAED32_2012-12-25/lib/stdcell_hvt/db_nldm
+# /home/ICer/Desktop/AUC_ASIC_Final/lib
+set_app_var target_library	"saed32hvt_ff0p95v125c.db" # "saed90nm_max_lth.db"
+saed32hvt_ff0p95v125c.db
+set_app_var link_library	"* $target_library"
+* saed32hvt_ff0p95v125c.db
+################################# Create Work Directory #############################
+sh rm -rf work
+sh mkdir -p work
+define_design_lib work -path ./work
+1
+################################# Read Files ######################
+################################# Packages ########################
+analyze -library WORK -format sverilog ../../../Arbiter/Package/Tx_Arbiter_Package.sv
+Running PRESTO HDLC
+Compiling source file ../../../Arbiter/Package/Tx_Arbiter_Package.sv
+Presto compilation completed successfully.
+Loading db file '/home/ICer/Desktop/Final-Project/SAED32_2012-12-25/lib/stdcell_hvt/db_nldm/saed32hvt_ff0p95v125c.db'
+1
+analyze -library WORK -format sverilog ../../../AXI/Slave_Package/axi_slave_package.sv
+Running PRESTO HDLC
+Compiling source file ../../../AXI/Slave_Package/axi_slave_package.sv
+Presto compilation completed successfully.
+1
+analyze -library WORK -format sverilog ../../../Data_Fragmentation/package/Fragmentation_Package.sv
+Running PRESTO HDLC
+Compiling source file ../../../Data_Fragmentation/package/Fragmentation_Package.sv
+Presto compilation completed successfully.
+1
+################################# AXI ########################
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/Slave_Requester_Recorder/Request_Recorder_if.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Internal_Response/Slave_Internal_Response_if.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Request_Path/Push_Fsms/axi_if.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_FIFOs/Sync_FIFO_Interface.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Response_Path/Push_FSM/Up_Down_Counter/Up_Down_Counter_Interface.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Response_Path/Pop_FSM/Master_Interface.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/Slave_Requester_Recorder/Request_Recorder.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Request_Path/Push_Fsms/axi_slave_fsm_wr.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Request_Path/Push_Fsms/axi_slave_fsm_rd.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_FIFOs/Sync_FIFO.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Request_Path/Pop_Fsms/fifo_pop_wr.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Request_Path/Pop_Fsms/fifo_pop_rd.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/A2P_Mapper/wr_atop.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/A2P_Mapper/rd_atop.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Response_Path/Push_FSM/Up_Down_Counter/Up_Down_Counter.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Response_Path/Push_FSM/Response_Push_FSM.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Response_Path/Pop_FSM/Response_Pop_FSM.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/P2A_Mapper/P2A_Interface.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/P2A_Mapper/P2A.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/Slave_Requester_Recorder/wr_interface_mux.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Internal_Response/slave_internal_response_rd_mux.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Internal_Response/slave_internal_response_wr_mux.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Top/Slave_Top.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Request_Path/Push_Fsms/axi_slave_fsm_tb.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Response_Path/Push_FSM/Up_Down_Counter/Up_Down_Counter_tb.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave/Slave_Response_Path/Push_FSM/Up_Down_Counter/Up_Down_Counter_Top.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Bridge/Slave_Requester_Recorder/dual_port_ram_tb.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Package/axi_slave_package.sv
+# analyze -library WORK -format sverilog ../../../AXI/Slave_Top/TestBench/Slave_tb.sv
+################################# Arbiter ########################
+# analyze -library WORK -format sverilog ../../../Arbiter/Sequence_recorder/Tx_Arbiter_Interface.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Flow_Control/Tx_FC_Interface.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Ordering/ordering_if.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Sequence_recorder/Tx_Arbiter.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Flow_Control/Tx_FC.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Sequence_recorder/Sequence_Recorder.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Ordering/ordering.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Controller/arbiter_fsm.sv
+# analyze -library WORK -format sverilog ../../../Arbiter/Intgerated/arbiter_Top.sv
+################################# Fragmentation ########################
+analyze -library WORK -format sverilog ../../../Data_Fragmentation/buffer/buffer_frag_interface.sv
+Running PRESTO HDLC
+Compiling source file ../../../Data_Fragmentation/buffer/buffer_frag_interface.sv
+Presto compilation completed successfully.
+1
+analyze -library WORK -format sverilog ../../../Data_Fragmentation/Controller/Fragmentation_Interface.sv
+Running PRESTO HDLC
+Compiling source file ../../../Data_Fragmentation/Controller/Fragmentation_Interface.sv
+Presto compilation completed successfully.
+1
+analyze -library WORK -format sverilog ../../../Data_Fragmentation/buffer/buffer_frag.sv
+Running PRESTO HDLC
+Compiling source file ../../../Data_Fragmentation/buffer/buffer_frag.sv
+Presto compilation completed successfully.
+1
+analyze -library WORK -format sverilog ../../../Data_Fragmentation/ECRC/ECRC.sv
+Running PRESTO HDLC
+Compiling source file ../../../Data_Fragmentation/ECRC/ECRC.sv
+Presto compilation completed successfully.
+1
+analyze -library WORK -format sverilog ../../../Data_Fragmentation/Controller/Frag.sv
+Running PRESTO HDLC
+Compiling source file ../../../Data_Fragmentation/Controller/Frag.sv
+Presto compilation completed successfully.
+1
+analyze -library WORK -format sverilog ../../../Data_Fragmentation/Integrated/data_frag_top.sv
+Running PRESTO HDLC
+Compiling source file ../../../Data_Fragmentation/Integrated/data_frag_top.sv
+Presto compilation completed successfully.
+1
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/buffer/buffer_frag_tb.sv
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/Controller/Fragmentation.sv
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/Controller/Fragmentation_Top.sv
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/ECRC/ecrc_if.sv
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/Fragmentation_Top.sv
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/package/Fragmentation_Package.sv
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/TLP_Buffer/buffer_frag.sv
+# analyze -library WORK -format sverilog ../../../Data_Fragmentation/TLP_Buffer/buffer_frag_interface.sv
+# analyze -library WORK -format sverilog ../../../pcie_tl.sv
+# analyze -library WORK -format sverilog ../../../tb.sv
+# analyze -library WORK -format sverilog ../../../TX_Top/tl_tx.sv
+# analyze -library WORK -format sverilog ../../../TX_Top/tl_tx_tb.sv
+################################# Top Design ########################
+# analyze -library WORK -format sverilog ../../../TX_Top/tl_tx.sv
+################################# Analyze and Elaborate Design ######################
+# read_file -format verilog regfile.v
+# analyze -library work -format verilog ../../../rtl/${design}.v
+elaborate $design -library work
+Loading db file '/home/synopsys/syn/O-2018.06-SP1/libraries/syn/gtech.db'
+Loading db file '/home/synopsys/syn/O-2018.06-SP1/libraries/syn/standard.sldb'
+  Loading link library 'saed32hvt_ff0p95v125c'
+  Loading link library 'gtech'
+Running PRESTO HDLC
+Presto compilation completed successfully.
+Elaborated 1 design.
+Current design is now 'data_frag_top'.
+Information: Building the design 'buffer_frag' instantiated from design 'data_frag_top' with
+	the parameters "|((N%clk%)(N%arst%)(N%_Src_if%I%WORK/buffer_frag_interface%buffer_arbiter%)(N%_Dist_if%I%WORK/Fragmentation_Interface%TLP_FIFO_FRAGMENTATION%))". (HDL-193)
+
+Statistics for case statements in always block at line 34 in file
+	'../../../Data_Fragmentation/buffer/buffer_frag.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|            46            |     no/auto      |
+|            49            |     no/auto      |
+|           120            |    auto/auto     |
+|           139            |    auto/auto     |
+|           153            |     no/auto      |
+===============================================
+
+Inferred memory devices in process
+	in routine buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_ line 34 in file
+		'../../../Data_Fragmentation/buffer/buffer_frag.sv'.
+==================================================================================
+|     Register Name      |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+==================================================================================
+|      wr_addr_reg       | Flip-flop |   4   |  Y  | N  | Y  | N  | N  | N  | N  |
+|      rd_addr_reg       | Flip-flop |   4   |  Y  | N  | Y  | N  | N  | N  | N  |
+|        MEM_reg         | Flip-flop | 2080  |  Y  | N  | Y  | N  | N  | N  | N  |
+| _Dist_if.rd_data_1_reg | Flip-flop |  130  |  Y  | N  | Y  | N  | N  | N  | N  |
+| _Dist_if.rd_data_2_reg | Flip-flop |  130  |  Y  | N  | Y  | N  | N  | N  | N  |
+|   _Dist_if.Count_reg   | Flip-flop |   5   |  Y  | N  | Y  | N  | N  | N  | N  |
+==================================================================================
+Statistics for MUX_OPs
+===============================================================================================================================================================
+|                                                     block name/line                                                       | Inputs | Outputs | # sel inputs |
+===============================================================================================================================================================
+| buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_/122 |   16   |   130   |      4       |
+| buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_/128 |   16   |   130   |      4       |
+| buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_/146 |   16   |   130   |      4       |
+===============================================================================================================================================================
+Presto compilation completed successfully.
+Information: Building the design 'Frag' instantiated from design 'data_frag_top' with
+	the parameters "|((N%clk%)(N%arst%)(N%_tlp_fifo_if%I%WORK/Fragmentation_Interface%FRAGMENTATION_TLP_FIFO%)(N%_dll_if%I%WORK/Fragmentation_Interface%FRAGMENTATION_DLL%)(N%_ecrc_if%I%WORK/Fragmentation_Interface%FRAGMENTATION_ECRC%))". (HDL-193)
+Warning:  ../../../Data_Fragmentation/Controller/Frag.sv:66: signed to unsigned conversion occurs. (VER-318)
+Warning:  ../../../Data_Fragmentation/Controller/Frag.sv:461: signed to unsigned conversion occurs. (VER-318)
+Warning:  ../../../Data_Fragmentation/Controller/Frag.sv:549: signed to unsigned conversion occurs. (VER-318)
+
+Statistics for case statements in always block at line 270 in file
+	'../../../Data_Fragmentation/Controller/Frag.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           272            |    auto/auto     |
+===============================================
+
+Statistics for case statements in always block at line 368 in file
+	'../../../Data_Fragmentation/Controller/Frag.sv'
+===============================================
+|           Line           |  full/ parallel  |
+===============================================
+|           389            |    auto/auto     |
+|            77            |    auto/auto     |
+|           148            |    auto/auto     |
+|            44            |    auto/auto     |
+|           105            |    auto/auto     |
+|           180            |    auto/auto     |
+===============================================
+
+Inferred memory devices in process
+	in routine Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_ line 231 in file
+		'../../../Data_Fragmentation/Controller/Frag.sv'.
+===============================================================================
+|    Register Name    |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===============================================================================
+|     TLP_reg_reg     | Flip-flop |  256  |  Y  | N  | Y  | N  | N  | N  | N  |
+|      state_reg      | Flip-flop |   3   |  Y  | N  | Y  | N  | N  | N  | N  |
+|   Length_temp_reg   | Flip-flop |  11   |  Y  | N  | Y  | N  | N  | N  | N  |
+|    ecrc_gen_reg     | Flip-flop |   1   |  N  | N  | Y  | N  | N  | N  | N  |
+|      temp_reg       | Flip-flop |   1   |  N  | N  | Y  | N  | N  | N  | N  |
+| Valid_Bytes_reg_reg | Flip-flop |   5   |  Y  | N  | Y  | N  | N  | N  | N  |
+|   Length_reg_reg    | Flip-flop |  11   |  Y  | N  | Y  | N  | N  | N  | N  |
+===============================================================================
+Presto compilation completed successfully.
+Information: Building the design 'ECRC' instantiated from design 'data_frag_top' with
+	the parameters "|((N%clk%)(N%arst%)(N%_if%I%WORK/Fragmentation_Interface%ECRC_FRAGMENTATION%))". (HDL-193)
+
+Inferred memory devices in process
+	in routine ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_ line 29 in file
+		'../../../Data_Fragmentation/ECRC/ECRC.sv'.
+===================================================================================
+|      Register Name      |   Type    | Width | Bus | MB | AR | AS | SR | SS | ST |
+===================================================================================
+| _if.ecrc_Result_reg_reg | Flip-flop |  32   |  Y  | N  | Y  | N  | N  | N  | N  |
+===================================================================================
+Presto compilation completed successfully.
+1
+################################# Check Design #####################################
+current_design $design
+Current design is 'data_frag_top'.
+{data_frag_top}
+check_design
+ 
+****************************************
+check_design summary:
+Version:     O-2018.06-SP1
+Date:        Tue May 21 01:36:26 2024
+****************************************
+
+                   Name                                            Total
+--------------------------------------------------------------------------------
+Inputs/Outputs                                                      2
+    Unconnected ports (LINT-28)                                     1
+    Shorted outputs (LINT-31)                                       1
+
+Cells                                                              36
+    Cells do not drive (LINT-1)                                    36
+--------------------------------------------------------------------------------
+
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C181788' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C181811' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C181828' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C181861' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C181910' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C181975' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182056' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182153' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182266' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182407' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182411' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182431' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182441' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182458' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182491' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182540' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182605' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182686' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182783' does not drive any nets. (LINT-1)
+Warning: In design 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_', cell 'C182896' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8149' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8160' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'B_44' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'B_45' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'B_46' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'B_47' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8289' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8333' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8391' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8392' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8415' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8417' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'B_53' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8437' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8440' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', cell 'C8443' does not drive any nets. (LINT-1)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', port '_dll_if.Throttle' is not connected to any nets. (LINT-28)
+Warning: In design 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_', output port '_ecrc_if.ecrc_EN' is connected directly to output port '_ecrc_if.ecrc_Seed_Load'. (LINT-31)
+1
+################################# Read Cons File ###################################
+# source  -echo -verbose /home/ICer/Desktop/AUC_ASIC_Final/syn/Syn_Cons.tcl
+################################## Link Design ######################################
+link
+
+  Linking design 'data_frag_top'
+  Using the following designs and libraries:
+  --------------------------------------------------------------------------
+  * (4 designs)               /mnt/hgfs/Tx/Scripts/DC/syn/data_frag_top.db, etc
+  saed32hvt_ff0p95v125c (library)
+                              /home/ICer/Desktop/Final-Project/SAED32_2012-12-25/lib/stdcell_hvt/db_nldm/saed32hvt_ff0p95v125c.db
+
+1
+################################## multi driven ports ###############################
+# set_fix_multiple_port_nets -all
+################################## Compile ##########################################
+compile -map_effort medium
+Information: Evaluating DesignWare library utilization. (UISN-27)
+
+============================================================================
+| DesignWare Building Block Library  |         Version         | Available |
+============================================================================
+| Basic DW Building Blocks           | O-2018.06-DWBB_201806.1 |     *     |
+| Licensed DW Building Blocks        |                         |           |
+============================================================================
+
+
+Information: There are 38 potential problems in your design. Please run 'check_design' for more information. (LINT-99)
+
+
+
+  Beginning Pass 1 Mapping
+  ------------------------
+  Processing 'ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_'
+  Processing 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_'
+  Processing 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_'
+  Processing 'data_frag_top'
+
+  Updating timing information
+Information: Updating design information... (UID-85)
+Information: Design 'data_frag_top' has no optimization constraints set. (OPT-108)
+
+  Beginning Implementation Selection
+  ----------------------------------
+  Processing 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC__DW01_dec_0'
+  Processing 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC__DW01_addsub_0'
+  Processing 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC__DW01_add_0'
+  Processing 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC__DW01_cmp2_0'
+  Processing 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC__DW01_cmp2_1'
+  Processing 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC__DW01_cmp2_2'
+  Processing 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION__DW01_addsub_0'
+  Processing 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION__DW01_add_0'
+  Processing 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION__DW01_add_1'
+  Processing 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION__DW01_addsub_1'
+
+  Beginning Mapping Optimizations  (Medium effort)
+  -------------------------------
+  Structuring 'ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_'
+  Mapping 'ECRC_I__if_Fragmentation_Interface_ECRC_FRAGMENTATION_'
+  Structuring 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_'
+  Mapping 'Frag_I__tlp_fifo_if_Fragmentation_Interface_FRAGMENTATION_TLP_FIFO_I__dll_if_Fragmentation_Interface_FRAGMENTATION_DLL_I__ecrc_if_Fragmentation_Interface_FRAGMENTATION_ECRC_'
+  Structuring 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_'
+  Mapping 'buffer_frag_I__Src_if_buffer_frag_interface_buffer_arbiter_I__Dist_if_Fragmentation_Interface_TLP_FIFO_FRAGMENTATION_'
+
+                                  TOTAL                                      
+   ELAPSED            WORST NEG   SETUP    DESIGN                            
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT         
+  --------- --------- --------- --------- --------- -------------------------
+    0:09:40  353881.0      0.00       0.0   97049.8                          
+    0:09:40  353881.0      0.00       0.0   97049.8                          
+    0:09:45  366341.7      0.00       0.0   65951.5                          
+    0:09:52  391658.8      0.00       0.0   11096.9                          
+    0:09:52  392831.4      0.00       0.0    9329.3                          
+    0:09:52  392831.4      0.00       0.0    9329.3                          
+    0:09:52  392831.4      0.00       0.0    9329.3                          
+    0:09:52  392831.4      0.00       0.0    9329.3                          
+    0:09:58  392831.4      0.00       0.0    9329.3                          
+    0:10:13  368521.5      0.00       0.0    9326.2                          
+    0:10:17  368482.9      0.00       0.0    9326.2                          
+    0:10:45  368482.9      0.00       0.0    9326.2                          
+    0:10:48  368482.9      0.00       0.0    9326.2                          
+    0:10:51  368482.9      0.00       0.0    9326.2                          
+    0:10:51  368482.9      0.00       0.0    9326.2                          
+    0:10:57  368957.4      0.00       0.0    8270.8                          
+    0:11:01  369038.2      0.00       0.0    7777.9                          
+    0:11:02  369050.4      0.00       0.0    7733.0                          
+    0:11:02  369053.4      0.00       0.0    7708.9                          
+    0:11:03  369054.5      0.00       0.0    7692.7                          
+    0:11:03  369055.0      0.00       0.0    7678.0                          
+    0:11:04  369055.0      0.00       0.0    7678.0                          
+    0:11:04  369055.0      0.00       0.0    7678.0                          
+    0:11:04  369055.0      0.00       0.0    7678.0                          
+
+
+
+  Beginning Delay Optimization Phase
+  ----------------------------------
+
+                                  TOTAL                                      
+   ELAPSED            WORST NEG   SETUP    DESIGN                            
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT         
+  --------- --------- --------- --------- --------- -------------------------
+    0:11:04  369055.0      0.00       0.0    7678.0                          
+    0:11:04  369055.0      0.00       0.0    7678.0                          
+    0:11:04  369055.0      0.00       0.0    7678.0                          
+
+
+  Beginning Design Rule Fixing  (max_transition)  (max_capacitance)
+  ----------------------------
+
+                                  TOTAL                                      
+   ELAPSED            WORST NEG   SETUP    DESIGN                            
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT         
+  --------- --------- --------- --------- --------- -------------------------
+    0:11:04  369055.0      0.00       0.0    7678.0                          
+    0:11:06  369206.7      0.00       0.0    6220.4 u_buffer_frag/net652401  
+    0:11:07  369410.0      0.00       0.0    5759.1 u_buffer_frag/net658006  
+    0:11:07  369613.3      0.00       0.0    5298.0 u_buffer_frag/net658363  
+    0:11:08  369816.6      0.00       0.0    4839.2 u_buffer_frag/net658004  
+    0:11:08  370019.9      0.00       0.0    4382.5 u_buffer_frag/net658358  
+    0:11:08  370210.6      0.00       0.0    3973.7 u_buffer_frag/net658003  
+    0:11:08  370388.5      0.00       0.0    3592.2 u_buffer_frag/net658311  
+    0:11:08  370566.4      0.00       0.0    3211.7 u_buffer_frag/net657920  
+    0:11:09  370744.3      0.00       0.0    2831.3 u_buffer_frag/net658228  
+    0:11:09  370922.2      0.00       0.0    2451.0 u_buffer_frag/net657101  
+    0:11:09  371100.1      0.00       0.0    2070.8 u_buffer_frag/net657409  
+    0:11:09  371273.9      0.00       0.0    1725.2 u_buffer_frag/net656970  
+    0:11:09  371451.8      0.00       0.0    1483.8 u_buffer_frag/net657278  
+    0:11:09  371629.7      0.00       0.0    1242.5 u_buffer_frag/net657586  
+    0:11:10  371805.1      0.00       0.0    1006.5 u_buffer_frag/U4/net538438
+    0:11:10  371983.0      0.00       0.0     771.7 u_buffer_frag/U4/net537888
+    0:11:10  372186.3      0.00       0.0     503.3 u_buffer_frag/U4/net538048
+    0:11:10  372389.6      0.00       0.0     235.0 u_buffer_frag/U4/net538208
+    0:11:10  372547.7      0.00       0.0      27.0 u_ECRC/net601021         
+    0:11:11  372607.6      0.00       0.0      10.7 u_buffer_frag/net658258  
+    0:11:12  372744.9      0.00       0.0       5.8 u_buffer_frag/net657961  
+    0:11:12  372882.1      0.00       0.0       0.9 u_buffer_frag/net657664  
+    0:11:12  372883.1      0.00       0.0       0.0                          
+
+
+  Beginning Area-Recovery Phase  (cleanup)
+  -----------------------------
+
+                                  TOTAL                                      
+   ELAPSED            WORST NEG   SETUP    DESIGN                            
+    TIME      AREA      SLACK     COST    RULE COST         ENDPOINT         
+  --------- --------- --------- --------- --------- -------------------------
+    0:11:12  372883.1      0.00       0.0       0.0                          
+    0:11:13  372883.1      0.00       0.0       0.0                          
+    0:11:28  371067.0      0.00       0.0       0.0                          
+    0:11:46  370373.2      0.00       0.0       0.0                          
+    0:12:01  370154.1      0.00       0.0       0.0                          
+    0:12:05  369946.0      0.00       0.0       0.0                          
+    0:12:13  369801.4      0.00       0.0       0.0                          
+    0:12:19  369681.9      0.00       0.0       0.0                          
+    0:12:33  369661.9      0.00       0.0       0.0                          
+    0:12:36  369643.0      0.00       0.0       0.0                          
+    0:12:39  369625.8      0.00       0.0       0.0                          
+    0:12:42  369609.2      0.00       0.0       0.0                          
+    0:12:44  369596.5      0.00       0.0       0.0                          
+    0:12:46  369583.8      0.00       0.0       0.0                          
+    0:12:49  369571.1      0.00       0.0       0.0                          
+    0:12:51  369558.4      0.00       0.0       0.0                          
+    0:12:54  369545.7      0.00       0.0       0.0                          
+    0:12:57  369533.0      0.00       0.0       0.0                          
+    0:12:57  369533.0      0.00       0.0       0.0                          
+    0:13:00  369533.0      0.00       0.0       0.0                          
+    0:13:03  369109.3      0.00       0.0       0.0                          
+    0:13:03  369109.3      0.00       0.0       0.0                          
+    0:13:03  369109.3      0.00       0.0       0.0                          
+    0:13:04  369109.3      0.00       0.0       0.0                          
+    0:13:04  369109.3      0.00       0.0       0.0                          
+    0:13:04  369109.3      0.00       0.0       0.0                          
+Loading db file '/home/ICer/Desktop/Final-Project/SAED32_2012-12-25/lib/stdcell_hvt/db_nldm/saed32hvt_ff0p95v125c.db'
+
+
+Note: Symbol # after min delay cost means estimated hold TNS across all active scenarios 
+
+
+  Optimization Complete
+  ---------------------
+1
+################################## Reports ##########################################
+sh rm -rf report
+sh mkdir -p report
+report_area 			> ./report/synth_area.rpt
+report_cell 			> ./report/synth_cells.rpt
+report_qor  			> ./report/synth_qor.rpt
+report_resources 		> ./report/synth_resources.rpt
+report_timing -max_paths 10 	> ./report/synth_timing_setup.rpt 
+# report_timing -min_paths 10 	> ./report/synth_timing_hold.rpt 
+################################## Write SDC File ####################################
+sh rm -rf output
+sh mkdir -p output 
+write_sdc  output/${design}.sdc 
+1
+define_name_rules  no_case -case_insensitive
+1
+change_names -rule no_case -hierarchy
+1
+change_names -rule verilog -hierarchy
+Warning: The specified replacement character (_) is conflicting with the specified allowed or restricted character.   (UCN-4)
+1
+set verilogout_no_tri	 true
+true
+set verilogout_equation  false
+false
+################################## Write Netlist #####################################
+write -hierarchy -format verilog -output output/${design}.v 
+Writing verilog file '/mnt/hgfs/Tx/Scripts/DC/syn/output/data_frag_top.v'.
+1
+write -f ddc -hierarchy -output output/${design}.ddc  
+Writing ddc file 'output/data_frag_top.ddc'.
+1
+# start_gui
+# exit
+dc_shell> [H[2Jdc_shell> start_gui 
+dc_shell> Current design is 'data_frag_top'.
+4.1
+Current design is 'data_frag_top'.
+dc_shell> Loading db file '/home/synopsys/syn/O-2018.06-SP1/libraries/syn/generic.sdb'
+dc_shell> 

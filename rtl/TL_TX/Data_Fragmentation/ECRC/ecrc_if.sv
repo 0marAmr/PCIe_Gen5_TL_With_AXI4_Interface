@@ -9,6 +9,7 @@
 /* Summary:  This file includes interface of ecrc block             */
 /********************************************************************/
 
+import Fragmentation_Package::*;
 
 
 // Define the interface of buffer used in ECRC block

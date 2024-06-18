@@ -2,12 +2,6 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -radix unsigned /Tx_FC_Top/clk
 add wave -noupdate -radix unsigned /Tx_FC_Top/arst
-add wave -noupdate -expand -group {FC_DLL_if
-} -radix unsigned /Tx_FC_Top/Tx_FC_if/TypeFC
-add wave -noupdate -expand -group {FC_DLL_if
-} -radix unsigned /Tx_FC_Top/Tx_FC_if/HdrFC
-add wave -noupdate -expand -group {FC_DLL_if
-} -radix unsigned /Tx_FC_Top/Tx_FC_if/DataFC
 add wave -noupdate -expand -group {FC_Arbiter_if
 } -radix unsigned /Tx_FC_Top/Tx_FC_if/PTLP_2
 add wave -noupdate -expand -group {FC_Arbiter_if
@@ -32,8 +26,11 @@ add wave -noupdate -expand -group CL_Registers -radix unsigned /Tx_FC_Top/u_Tx_F
 add wave -noupdate -expand -group CL_Registers -radix unsigned /Tx_FC_Top/u_Tx_FC/CL_Completion_Data
 add wave -noupdate -expand -group PTLP_Conv -radix unsigned /Tx_FC_Top/u_Tx_FC/FC_PTLP_Conv/PTLP
 add wave -noupdate -expand -group PTLP_Conv -radix unsigned /Tx_FC_Top/u_Tx_FC/FC_PTLP_Conv/FC_PTLP_Conv
+add wave -noupdate -expand -group {DLL Interface} /Tx_FC_Top/u_Tx_FC/TypeFC
+add wave -noupdate -expand -group {DLL Interface} /Tx_FC_Top/u_Tx_FC/HdrFC
+add wave -noupdate -expand -group {DLL Interface} /Tx_FC_Top/u_Tx_FC/DataFC
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {0 ps} 0}
+WaveRestoreCursors {{Cursor 1} {247 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 209
 configure wave -valuecolwidth 100
@@ -49,4 +46,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {142 ps}
+WaveRestoreZoom {0 ps} {95 ps}

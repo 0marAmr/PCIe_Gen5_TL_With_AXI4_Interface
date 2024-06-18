@@ -33,8 +33,8 @@ import axi_slave_package::*;
     // interface with FIFO of Read request (AR )
     input logic   [ARFIFO_WIDTH - 1 : 0] ARFIFO_DATA,   // it is a read location from ar fifo 
 
-    input logic   [REQUESTER_ID_WIDTH - 1 : 0] Requester_ID,  // it will be hardwired in top module, coming from CFG space
-
+    input logic   [REQUESTER_ID_WIDTH - 1 : 0]  Requester_ID,  // it will be hardwired in top module, coming from CFG space
+    input logic                                 config_ecrc,    // this bit from configuration indicate ecrc generation is enabled
     output tlp_header_t axi_rdreq_hdr,  // generated header of request, the data type if tlp_header (struct cover 4 DW of Header including all fields)
 
     Request_Recorder_if.request_recorder_wrreqport recorder_if,
@@ -63,15 +63,16 @@ import axi_slave_package::*;
 function  [TAG_WIDTH - 2:0] generate_tag;
 input [$clog2(AWFIFO_DEPTH) - 1 :0] id;
 begin
+    generate_tag[$clog2(AWFIFO_DEPTH) - 1 :0] = id;
 
-    if (TAG_WIDTH - ($clog2(AWFIFO_DEPTH)) > 1'b1 ) begin
-        // Generate a unique 7-bit tag value based on the (4 or 5 or 6) -bit ID input
-        generate_tag[$clog2(AWFIFO_DEPTH) - 1 :0] = id;
-        generate_tag[TAG_WIDTH - 2 :$clog2(AWFIFO_DEPTH)] = {{4'b1, id} ^ 8'b10101010};
-    end
-    else  begin
-        generate_tag[TAG_WIDTH - 2 :0] = id;
-    end
+    // if (TAG_WIDTH - ($clog2(AWFIFO_DEPTH)) > 1'b1 ) begin
+    //     // Generate a unique 7-bit tag value based on the (4 or 5 or 6) -bit ID input
+    //     generate_tag[$clog2(AWFIFO_DEPTH) - 1 :0] = id;
+    //     generate_tag[TAG_WIDTH - 2 :$clog2(AWFIFO_DEPTH)] = {{4'b1, id} ^ 8'b10101010};
+    // end
+    // else  begin
+    //     generate_tag[TAG_WIDTH - 2 :0] = id;
+    // end
 end
 endfunction
 
@@ -172,7 +173,7 @@ begin
                         axi_rdreq_hdr.ATTR  = 1'b1 ;
                         axi_rdreq_hdr.LN    = 1'b0 ;
                         axi_rdreq_hdr.TH    = 1'b1 ;   // Defined at specification page. 117
-                        axi_rdreq_hdr.TD    = 1'b0 ;
+                        axi_rdreq_hdr.TD    = (config_ecrc) ? 1'b1: 1'b0 ;
                         axi_rdreq_hdr.EP    = 1'b0 ;
                         axi_rdreq_hdr.Attr  = 'b10  ;
                         axi_rdreq_hdr.AT    = 'b0  ;
@@ -221,7 +222,7 @@ begin
                         axi_rdreq_hdr.ATTR  = 1'b1 ;
                         axi_rdreq_hdr.LN    = 1'b0 ;
                         axi_rdreq_hdr.TH    = 1'b1 ;  // Defined at specification page. 117
-                        axi_rdreq_hdr.TD    = 1'b0 ;
+                        axi_rdreq_hdr.TD    = (config_ecrc) ? 1'b1: 1'b0 ;
                         axi_rdreq_hdr.EP    = 1'b0 ;
                         axi_rdreq_hdr.Attr  = 'b10  ;
                         axi_rdreq_hdr.AT    = 'b0  ;
@@ -285,7 +286,7 @@ begin
                         axi_rdreq_hdr.ATTR  = 1'b1 ;
                         axi_rdreq_hdr.LN    = 1'b0 ;
                         axi_rdreq_hdr.TH    = 1'b1 ;
-                        axi_rdreq_hdr.TD    = 1'b0 ;
+                        axi_rdreq_hdr.TD    = (config_ecrc) ? 1'b1: 1'b0 ;
                         axi_rdreq_hdr.EP    = 1'b0 ;
                         axi_rdreq_hdr.Attr  = 'b10  ;
                         axi_rdreq_hdr.AT    = 'b0  ;
@@ -319,7 +320,7 @@ begin
                 
 
                     // Calculating Lower Address and Higher Address
-                    axi_rdreq_hdr.Higher_Address        = ARADDR [64:32] ; 
+                    axi_rdreq_hdr.Higher_Address        = ARADDR [63:32] ; 
                     axi_rdreq_hdr.Lower_Address         = ARADDR [31:2];
                     axi_rdreq_hdr.PH                    = 2'b00;
             

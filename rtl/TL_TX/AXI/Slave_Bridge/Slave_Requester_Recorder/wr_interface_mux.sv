@@ -14,10 +14,9 @@ module wr_interface_mux (
            Request_Recorder_if.wrreqport_request_recorder  write_if,
            Request_Recorder_if.wrreqport_request_recorder  read_if,
            input  logic                                   axi_req_wr_grant,
-           input  logic                                   axi_req_rd_grant,
-                    
+           input  logic                                   axi_req_rd_grant,         
            // Output 
-           Request_Recorder_if.wrreqport_request_recorder  _if
+           Request_Recorder_if.request_recorder_wrreqport  _if
 ); 
 
 // input  req_wr_en ,

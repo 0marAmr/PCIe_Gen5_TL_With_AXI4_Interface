@@ -14,7 +14,7 @@
 
 // Define the standard interface of axi (5 channels)
 
-interface axi_if ();
+interface axi_if;
 
 
     // import the defined package for axi
@@ -145,6 +145,8 @@ modport axi_slave_top (
                                     WREADY
 
 );
+
+
 
 
 

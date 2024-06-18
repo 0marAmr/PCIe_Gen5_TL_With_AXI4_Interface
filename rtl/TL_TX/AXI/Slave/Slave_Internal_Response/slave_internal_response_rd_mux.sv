@@ -11,8 +11,8 @@ into one interface                              */
 
 
 module slave_internal_response_rd_mux (
-    Slave_Internal_Response_if.AR_TO_R                in_1_resp_rd_mux_if, // error
-    Slave_Internal_Response_if.AR_TO_R                in_2_resp_rd_mux_if, // posted
+    Slave_Internal_Response_if.R_TO_AR                in_1_resp_rd_mux_if, // error
+    Slave_Internal_Response_if.R_TO_AR                in_2_resp_rd_mux_if, // posted
 
     Slave_Internal_Response_if.AR_TO_R                out_resp_rd_mux_if
 ); 
@@ -32,7 +32,7 @@ always_comb begin
             out_resp_rd_mux_if.RRESP = INVALID;
             out_resp_rd_mux_if.RID = '0; 
          end 
-         2'b10 : begin 
+         2'b01 : begin 
             out_resp_rd_mux_if.RVALID = in_2_resp_rd_mux_if.RVALID;
             out_resp_rd_mux_if.RRESP   = in_2_resp_rd_mux_if.RRESP  ;
             out_resp_rd_mux_if.RID    = in_2_resp_rd_mux_if.RID   ;

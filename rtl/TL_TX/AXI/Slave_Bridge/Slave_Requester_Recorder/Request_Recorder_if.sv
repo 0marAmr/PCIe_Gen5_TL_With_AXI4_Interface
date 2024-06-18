@@ -1,5 +1,5 @@
 
-/* Module Name	: Request_Recorder_if.sv	        */
+/* Module Name	: Request_Recorder_if.sv	    */
 /* Written By	: Mohamed Aladdin             	*/
 /* Date			: 04-04-2024					*/
 /* Version		: V_1							*/
@@ -12,7 +12,7 @@
 
 // Define the interface of dual port ram 
 
-interface Request_Recorder_if ();
+interface Request_Recorder_if;
 
 
     // import the defined package for axi
@@ -37,34 +37,40 @@ interface Request_Recorder_if ();
     logic [REQUESTER_RECORDER_WIDTH - 1 : 0]       resp_rd_data;
 
     // Read Port for request path from push fsm 
-    modport request_recorder_rdreqport_wr (
+    modport rdreqport_wr_request_recorder (
                                      output req_rd_addr_wr ,
                                      input  req_rd_data_wr 
     );
-    modport request_recorder_rdreqport_rd (
+    // Read Port for request path from Request Recorder 
+    modport request_recorder_rdreqport_wr (
+                                     input  req_rd_addr_wr ,
+                                     output req_rd_data_wr 
+    );
+    
+    modport rdreqport_rd_request_recorder (
                                      output req_rd_addr_rd ,
                                      input  req_rd_data_rd 
     );
     
-
-    // Write Port for request path from mapper
-    modport request_recorder_wrreqport (
-                                     output req_wr_en ,
-                                            req_wr_data, 
-                                            req_wr_addr
+    modport request_recorder_rdreqport_rd (
+                                     input  req_rd_addr_rd ,
+                                     output req_rd_data_rd 
     );
-    
-     // Write Port for request path to memory of request recorder
+
+     // Write Port for request path to memory of request recorder, it is the input of Mux.
     modport wrreqport_request_recorder (
                                      input  req_wr_en ,
                                             req_wr_data, 
                                             req_wr_addr
     );
+     // Write Port for request path to memory of request recorder, it is the output of Mux.
+    modport request_recorder_wrreqport (
+                                     output  req_wr_en ,
+                                            req_wr_data, 
+                                            req_wr_addr
+    );
     
-
-
-
-
+    
     // Interface P2A with Request Recorder
     modport P2A_REQUEST_RECORDER (
         input   resp_rd_data,

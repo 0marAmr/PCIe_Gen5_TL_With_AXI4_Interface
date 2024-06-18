@@ -190,7 +190,6 @@ end
 //             end
 //             // check that this is completion TLP with data
 //             else if ((_router_if.Resp_HDR.fmt == TLP_FMT_3DW_DATA) && (_router_if.Resp_HDR.Type == TLP_TYPE_CPLD)) begin
-//                 $display("Here");
 //                 // enable "Push FSM"
 //                 _push_if.Cpl_Type   = CPLD;
 //                 _push_if.Cpl_Length = _router_if.Resp_HDR.Length;

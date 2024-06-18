@@ -6,7 +6,7 @@
 /* Dependencies	: -				            */
 /* Used			: 			                */
 
-import data_frag_package::*;
+import Fragmentation_Package::*;
 
 module buffer_frag_tb (); 
 

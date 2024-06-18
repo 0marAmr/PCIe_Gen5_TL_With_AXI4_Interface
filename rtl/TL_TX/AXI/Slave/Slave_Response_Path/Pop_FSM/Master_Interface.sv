@@ -6,9 +6,7 @@
 /* Dependencies	: -				*/
 /* Used			: -			*/
 // `timescale 1ns/1ps
-interface Master_Interface #(
-)(
-);
+interface Master_Interface;
     import axi_slave_package::*;
     B_Channel_Slv_t B_Channel_Slv;  // B Channel Slave  outputs
     B_Channel_Msr_t B_Channel_Msr;  // B Channel Master outputs

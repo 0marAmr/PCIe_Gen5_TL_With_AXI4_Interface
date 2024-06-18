@@ -8,7 +8,6 @@
 // `timescale 1ns/1ps
 interface P2A_Push_FSM_Interface #(
     parameter DATA_WIDTH = 1024
-)(
 );
     import axi_slave_package::*;
 
@@ -47,7 +46,6 @@ endinterface: P2A_Push_FSM_Interface
 
 interface P2A_Rx_Router_Interface #(
     parameter DATA_WIDTH = 1024
-)(
 );
     // import P2A_Cpl_Package::*;
     import axi_slave_package::*;

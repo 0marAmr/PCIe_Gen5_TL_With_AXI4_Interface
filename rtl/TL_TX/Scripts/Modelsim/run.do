@@ -58,7 +58,8 @@ quit -sim
     vlog -work work {../../../AXI/Slave_Top/TestBench/Slave_tb.sv}
 
 ####################### Run Simulation #######################
-    vsim -novopt -sv_seed 2213853717 work.Slave_tb
+    vsim -novopt -sv_seed 2262425633 work.Slave_tb
+     
     do {../waveform.do}
 
 run -all
