@@ -1,8 +1,7 @@
 module tl_rx_error_check_malformed #(
     parameter DATA_WIDTH=10
-
 )(
-    input wire [2:0]            last_byte,
+    input wire [2:0]            last_dw,
     input wire [2:0]            last_rcv_data,
     input wire                  eop,
     input wire                  i_rcv_done,    
@@ -85,7 +84,7 @@ module tl_rx_error_check_malformed #(
 
     always @(*) begin
         if (malformed_en==1) begin
-            if (last_rcv_data != last_byte) begin
+            if (last_rcv_data != last_dw) begin
                 malformed_error=1;
             end
             else if (eop != i_rcv_done) begin

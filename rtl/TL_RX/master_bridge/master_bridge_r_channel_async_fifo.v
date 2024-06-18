@@ -2,9 +2,9 @@
    Copyright (c) 2024 PCIe V5 graduation project 
    -----------------------------------------------------------------------------
    FILE NAME :      master_bridge_r_channel_async_fifo
-   DEPARTMENT :     PCIe-AXI Bridge Side of inbound
-   AUTHOR :         Omar Hafez
-   AUTHOR’S EMAIL : eng.omar.amr@gmail.com
+   DEPARTMENT :     AXI - PCIe Master Bridge
+   AUTHOR :         Reem Mohamed - Omar Hafez
+   AUTHORS EMAIL : reemmuhamed118@gmail.com - eng.omar.amr@gmail.com
    -----------------------------------------------------------------------------
    VERSION  DATE        AUTHOR      DESCRIPTION
    1.0      2024-04-20              initial version
@@ -24,7 +24,7 @@
 module master_bridge_r_channel_async_fifo #(
    parameter   DW = 32,
                BEAT_SIZE = 32*DW,
-               R_CH_INFO_WIDTH = 30,
+               R_CH_INFO_WIDTH = 56,
                ADDR_WIDTH = 5,
                R_CH_INFO_FIFO_DEPTH = 32,
                R_CH_DATA_FIFO_DEPTH = 32
@@ -69,7 +69,7 @@ module master_bridge_r_channel_async_fifo #(
       .i_r_clk(i_r_clk),
       .i_r_n_rst(i_r_n_rst),
       .i_r_inc(i_r_info_inc),
-      .o_r_data(i_r_info),
+      .o_r_data(o_r_info),
       //------ Flags ------//
       .o_w_full_flag(r_info_full_flag),
       .o_r_empty_flag(r_info_empty_flag)
@@ -85,7 +85,7 @@ module master_bridge_r_channel_async_fifo #(
       .i_w_clk(i_w_clk),
       .i_w_n_rst(i_w_n_rst),
       .i_w_inc(i_w_data_inc),
-      .i_w_data(ARCHANNEL),
+      .i_w_data(i_w_data),
       //------ Read Interface ------//
       .i_r_clk(i_r_clk),
       .i_r_n_rst(i_r_n_rst),

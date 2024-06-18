@@ -2,9 +2,9 @@
    Copyright (c) 2024 PCIe V5 graduation project.
    -----------------------------------------------------------------------------
    FILE NAME :      axi_to_pcie_map
-   DEPARTMENT :     master_bridge
-   AUTHOR :         Omar Hafez
-   AUTHOR’S EMAIL : eng.omar.amr@gmail.com
+   DEPARTMENT :     AXI - PCIe Master Bridge
+   AUTHOR :         Reem Mohamed - Omar Hafez
+   AUTHOR’S EMAIL : reemmuhamed118@gmail.com - eng.omar.amr@gmail.com
    -----------------------------------------------------------------------------
    RELEASE HISTORY
    VERSION  DATE        AUTHOR      DESCRIPTION
@@ -29,13 +29,14 @@
         parameter   ID_WIDTH = 10,
                     TAG_WIDTH =10,
                     REQUESTER_ID_WIDTH = 16,
-                    LEN_FIELD_WIDTH = 10,
+                    PAYLOAD_LENGTH = 10,
                     TC_WIDTH = 3,
+                    QOS_WIDTH = 4,
                     LOWER_ADDR_FIELD = 7,
                     BYTE_ENABLES_WIDTH = 4,
                     ADDR_LSBS_PORTION = 5,
-                    R_USER_SIG_WIDTH = REQUESTER_ID_WIDTH + 2*BYTE_ENABLES_WIDTH + ADDR_LSBS_PORTION + TC_WIDTH + LEN_FIELD_WIDTH + 1, // 43
-                    B_USER_SIG_WIDTH = REQUESTER_ID_WIDTH +  TC_WIDTH, // 19
+                    R_USER_SIG_WIDTH = 44,
+                    B_USER_SIG_WIDTH = 20, 
                     BYTE_COUNT_WIDTH = 12,
                     RESP_WIDTH = 2
    ) (
@@ -44,7 +45,7 @@
     input  wire [RESP_WIDTH-1:0]        i_BRESP,
     input  wire [B_USER_SIG_WIDTH-1:0]  i_BUSER,
     input  wire                         i_BVALID_fifo,
-    output reg                         o_b_ch_read_inc,  
+    output reg                          o_b_ch_read_inc,  
     //------- R Channel -------//
     input  wire [ID_WIDTH-1:0]          i_RID,        
     input  wire [RESP_WIDTH-1:0]        i_RRESP,
@@ -53,11 +54,11 @@
     output reg                          o_r_ch_read_info_inc,
     //------ Completion Generator Interface  ------//
     input  wire                              i_cpl_info_inc,
-    output reg  [REQUESTER_ID_WIDTH-1:0]     o_requester_id,
+    output reg  [REQUESTER_ID_WIDTH-1:0]     o_cpl_requester_id,
     output reg                               o_cpl_type,
     output reg  [TAG_WIDTH-1:0]              o_cpl_tag,
     output reg  [TC_WIDTH-1:0]               o_cpl_traffic_class,
-    output reg  [LEN_FIELD_WIDTH-1:0]        o_cpl_length,
+    output reg  [PAYLOAD_LENGTH-1:0]         o_cpl_length,
     output reg  [LOWER_ADDR_FIELD-1:0]       o_cpl_lower_address,
     output reg                               o_cpl_error_flag,
     output reg  [BYTE_COUNT_WIDTH-1:0]       o_cpl_initial_byte_count,
@@ -88,17 +89,23 @@
     reg [1:0] byte_level_address; // least significant two bits of the lower address
 
     wire [REQUESTER_ID_WIDTH-1:0] r_requester_id;
+    wire [QOS_WIDTH-1:0]          r_qos;
     wire [BYTE_ENABLES_WIDTH-1:0] r_first_dw_byte_enable;
+    wire [BYTE_ENABLES_WIDTH-1:0] r_last_dw_byte_enable;
     wire [ADDR_LSBS_PORTION-1:0]  r_address_lsbs;
+    wire [5:0]                    r_pushed_data_cntr;
+    wire [4:0]                    r_last_dw;
     wire [TC_WIDTH-1:0]           r_traffic_class;
-    wire [LEN_FIELD_WIDTH-1:0]    r_payload_length;
-    wire                          r_responce_type; // MEMORY - IO
+    wire [PAYLOAD_LENGTH-1:0]     r_payload_length;
+    // wire                          r_responce_type; // MEMORY - IO
 
-    wire [TC_WIDTH-1:0]           b_traffic_class;
+    wire [QOS_WIDTH-1:0]          b_qos;
     wire [REQUESTER_ID_WIDTH-1:0] b_requester_id;
 
-    assign {r_requester_id, r_first_dw_byte_enable, r_last_dw_byte_enable, r_address_lsbs, r_traffic_class, r_payload_length, r_responce_type} = i_RUSER;
-    assign {b_requester_id, b_traffic_class} = i_BUSER;
+    assign {r_requester_id, r_qos, r_first_dw_byte_enable, r_last_dw_byte_enable, r_address_lsbs, r_pushed_data_cntr, r_last_dw} = i_RUSER;
+    assign {b_requester_id, b_qos} = i_BUSER;
+
+    assign r_payload_length =  (r_pushed_data_cntr << 5) + r_last_dw;
 
     //------- R-B Channels Arbitration -------//
     always @(*) begin
@@ -110,21 +117,16 @@
         end
     end
 
-    always @(*) begin // add round robin via in case both valid
+    always @(*) begin // add round robin via xor in case both valid
         o_r_ch_read_info_inc = 0;
         o_b_ch_read_inc = 0;
         if(channel_selection == READ_RESP) begin
-            o_requester_id = r_requester_id;
+            o_cpl_requester_id = r_requester_id;
             o_cpl_tag = i_RID;           
-            o_cpl_traffic_class = r_traffic_class;
+            o_cpl_traffic_class = r_qos[2:0];
             o_cpl_length = r_payload_length;
             o_cpl_lower_address = {r_address_lsbs, byte_level_address};
-            if (r_responce_type ==MEMORY) begin
-                o_cpl_type = DATA;
-            end
-            else begin
-                o_cpl_type = NODATA;
-            end
+            o_cpl_type = DATA;
             if (i_RRESP == OKAY) begin
                 o_cpl_error_flag = 1'b0;
             end 
@@ -135,9 +137,9 @@
             o_cpl_valid = i_RVALID_fifo;
         end
         else if(channel_selection == WRITE_RESP) begin
-            o_requester_id = b_requester_id;
+            o_cpl_requester_id = b_requester_id;
             o_cpl_tag = i_BID;           
-            o_cpl_traffic_class = b_traffic_class;
+            o_cpl_traffic_class = b_qos[2:0];
             o_cpl_length = 1'b1;
             o_cpl_lower_address = 7'b0;
             o_cpl_type = NODATA;
@@ -182,7 +184,7 @@
     
     //------- Initial Byte Count Calculation -------//
     always @(*) begin
-        if ((channel_selection == READ_RESP)&&(r_responce_type == MEMORY)) begin
+        if ((channel_selection == READ_RESP)) begin
             casez ({r_first_dw_byte_enable, r_last_dw_byte_enable})
                 /****** Length is less than or equal 1 DW ******/
                 8'b1??1_0000: begin
